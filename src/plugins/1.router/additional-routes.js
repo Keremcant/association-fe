@@ -12,12 +12,10 @@ export const redirects = [
       const userData = useCookie('userData')
       const userRole = userData.value?.role
 
-      console.log('userRole', userRole)
-
 
       if(userData.value){
         if(userRole[0].name === 'ADMIN')
-          return { name: 'brand-brand' }
+          return { name: 'dashboard-dashboard' }
       }
 
       return { name: 'login', query: to.query }

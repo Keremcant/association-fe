@@ -2,18 +2,19 @@ import axios from 'axios'
 
 const axiosIns = axios.create({
   // You can add your headers here
-  // ================================
+  // ================================npm rju
   baseURL: import.meta.env.VITE_API_BASE_URL,
 
   // timeout: 1000,
   // headers: {'X-Custom-Header': 'foobar'}
 })
 
+
 // ℹ️ Add request interceptor to send the authorization header on each subsequent request after login
 axiosIns.interceptors.request.use(config => {
+
   // Retrieve token from localStorage
-  const token = localStorage.getItem('accessToken')
-  const activeBranch = localStorage.getItem('active-branch')
+  const token = useCookie('miningToken').value
 
   // If token is found
   if (token) {
@@ -22,16 +23,7 @@ axiosIns.interceptors.request.use(config => {
 
     // Set authorization header
     // ℹ️ JSON.parse will convert token to string
-    config.headers.Authorization = token ? `Bearer ${JSON.parse(token)}` : ''
-  }
-
-  if (activeBranch) {
-    // Get request headers and if headers is undefined assign blank object
-    config.headers = config.headers || {}
-
-    // Set authorization header
-    // ℹ️ JSON.parse will convert token to string
-    config.headers['x-active-branch'] = activeBranch
+    config.headers.Authorization = token ? `Bearer ${token}` : ''
   }
 
   // Return modified config
@@ -44,20 +36,9 @@ axiosIns.interceptors.response.use(
     return response
   },
   error => {
-    // Handle error
-    if (error.response.status === 401) {
-      // ℹ️ Logout user and redirect to login page
-      // Remove "userData" from localStorage
-      localStorage.removeItem('userData')
+    if (error.response.status === 500 || error.response.status === 400 || error.response.status === 404) {
 
-      // Remove "accessToken" from localStorage
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('userAbilities')
-
-      // If 401 response returned from api
-      router.push('/login')
-    } else {
-      return Promise.reject(error)
+      return error.response
     }
   },
 )

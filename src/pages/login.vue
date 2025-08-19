@@ -1,22 +1,13 @@
 <!-- ❗Errors in the form are set on line 60 -->
 <script setup>
 import { VForm } from 'vuetify/components/VForm'
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
-import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
-import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
-import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
-import authV2LoginIllustrationDark from '@images/pages/auth-v2-login-illustration-dark.png'
-import authV2LoginIllustrationLight from '@images/pages/auth-v2-login-illustration-light.png'
-import authV2MaskDark from '@images/pages/misc-mask-dark.png'
-import authV2MaskLight from '@images/pages/misc-mask-light.png'
+import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?raw'
+import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?raw'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import axios from "@/plugins/axios"
 // eslint-disable-next-line import/extensions
 import { useAbility } from "@/plugins/casl/composables/useAbility.js"
-
-const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
-const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
 
 definePage({
   meta: {
@@ -38,32 +29,54 @@ const errors = ref({
 const refVForm = ref()
 
 const credentials = ref({
-  email: 'admin@demo.com',
-  password: 'Oxit2016.',
+  email: '',
+  password: '',
 })
 
-const rememberMe = ref(false)
+const snackbar = ref()
 
 const login = async () => {
   try {
+    const encodedPassword = btoa(credentials.value.password)
+
     const res = await axios.post('/auth/login', {
       email: credentials.value.email,
-      password: credentials.value.password,
+      password: encodedPassword,
     })
 
     const { accessToken, userData, userAbilities } = res.data
 
-    useCookie('userAbilityRules').value = userAbilities
+    // Eğer firstEntry true ise query paramlara bakma, direkt yönlendir
+    if (userData.firstEntry) {
+      router.push({ name: 'first-entry-id', params: { id: userData.id } })
+
+      return
+    }
+
+    // Normal login akışı
+    useCookie('miningAbilityRules').value = userAbilities
     ability.update(userAbilities)
-    useCookie('userData').value = userData
-    useCookie('accessToken').value = accessToken
+
+    if (Array.isArray(userData.role) && userData.role.length === 1) {
+      userData.role = userData.role
+    }
+
+    useCookie('miningData').value = userData
+    useCookie('miningToken').value = accessToken
+
     await nextTick(() => {
-      router.replace(route.query.to ? String(route.query.to) : '/')
+      const roleRoutes = { 'ADMIN': '/dashboard/dashboard' }
+      const redirectPath = roleRoutes[userData.role.name] || '/dashboard/dashboard'
+
+      // query param varsa normal kullanıcı için kullan, firstEntry için zaten return ettik
+      router.replace(route.query.to ? String(route.query.to) : redirectPath)
     })
   } catch (err) {
-    console.error(err)
+    snackbar.value.show('Incorrect password or incorrect e-mail. Please Try Again', 'error')
   }
 }
+
+
 
 const onSubmit = () => {
   refVForm.value?.validate().then(({ valid: isValid }) => {
@@ -74,76 +87,50 @@ const onSubmit = () => {
 </script>
 
 <template>
-  <RouterLink to="/">
-    <div class="auth-logo d-flex align-center gap-x-3">
-      <VNodeRenderer :nodes="themeConfig.app.logo" />
-      <h1 class="auth-title">
-        {{ themeConfig.app.title }}
-      </h1>
-    </div>
-  </RouterLink>
+  <div class="auth-wrapper d-flex align-center justify-center pa-4">
+    <div class="position-relative my-sm-16">
+      <!-- 👉 Top shape -->
+      <VNodeRenderer
+        :nodes="h('div', { innerHTML: authV1TopShape })"
+        class="text-primary auth-v1-top-shape d-none d-sm-block"
+      />
 
-  <VRow
-    no-gutters
-    class="auth-wrapper bg-surface"
-  >
-    <VCol
-      md="8"
-      class="d-none d-md-flex"
-    >
-      <div class="position-relative bg-background w-100 me-0">
-        <div
-          class="d-flex align-center justify-center w-100 h-100"
-          style="padding-inline: 6.25rem;"
-        >
-          <VImg
-            max-width="613"
-            :src="authThemeImg"
-            class="auth-illustration mt-16 mb-2"
-          />
-        </div>
+      <!-- 👉 Bottom shape -->
+      <VNodeRenderer
+        :nodes="h('div', { innerHTML: authV1BottomShape })"
+        class="text-primary auth-v1-bottom-shape d-none d-sm-block"
+      />
 
-        <img
-          class="auth-footer-mask"
-          :src="authThemeMask"
-          alt="auth-footer-mask"
-          height="280"
-          width="100"
-        >
-      </div>
-    </VCol>
-
-    <VCol
-      cols="12"
-      md="4"
-      class="auth-card-v2 d-flex align-center justify-center"
-    >
+      <!-- 👉 Auth Card -->
       <VCard
-        flat
-        :max-width="500"
-        class="mt-12 mt-sm-0 pa-4"
+        class="auth-card"
+        max-width="460"
+        :class="$vuetify.display.smAndUp ? 'pa-6' : 'pa-0'"
       >
+        <!--
+          <VCardItem class="justify-center">
+          <VCardTitle>
+          <RouterLink to="/">
+          <div class="app-logo">
+          <img
+          width="200px"
+          :src="udeaLogo"
+          >
+          </div>
+          </RouterLink>
+          </VCardTitle>
+          </VCardItem>
+        -->
+
         <VCardText>
           <h4 class="text-h4 mb-1">
-            Welcome to <span class="text-capitalize"> {{ themeConfig.app.title }} </span>! 👋🏻
+            <span class="text-capitalize">mining Admin Panel</span>
           </h4>
           <p class="mb-0">
-            Please sign-in to your account and start the adventure
+            {{ $t('Please sign-in to your account') }}
           </p>
         </VCardText>
-        <VCardText>
-          <VAlert
-            color="primary"
-            variant="tonal"
-          >
-            <p class="text-sm mb-2">
-              Admin Email: <strong>admin@demo.com</strong> / Pass: <strong>admin</strong>
-            </p>
-            <p class="text-sm mb-0">
-              Client Email: <strong>client@demo.com</strong> / Pass: <strong>client</strong>
-            </p>
-          </VAlert>
-        </VCardText>
+
         <VCardText>
           <VForm
             ref="refVForm"
@@ -151,76 +138,61 @@ const onSubmit = () => {
           >
             <VRow>
               <!-- email -->
-              <VCol cols="12">
+              <VCol
+                cols="12"
+                class="mb-4"
+              >
                 <AppTextField
                   v-model="credentials.email"
-                  label="Email"
-                  placeholder="johndoe@email.com"
+                  :label="$t('Email')"
+                  :placeholder="$t('Email')"
                   type="email"
                   autofocus
                   :rules="[requiredValidator, emailValidator]"
                   :error-messages="errors.email"
+                  class="auth-input"
                 />
               </VCol>
 
               <!-- password -->
-              <VCol cols="12">
+              <VCol
+                cols="12"
+                class="mb-4"
+              >
                 <AppTextField
                   v-model="credentials.password"
-                  label="Password"
+                  :label="$t('Password')"
                   placeholder="············"
                   :rules="[requiredValidator]"
                   :type="isPasswordVisible ? 'text' : 'password'"
                   autocomplete="password"
                   :error-messages="errors.password"
                   :append-inner-icon="isPasswordVisible ? 'tabler-eye-off' : 'tabler-eye'"
+                  class="auth-input"
+                  style="min-width: 300px;"
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
                 />
+              </VCol>
 
-                <div class="d-flex align-center flex-wrap justify-space-between my-6">
-                  <VCheckbox
-                    v-model="rememberMe"
-                    label="Remember me"
-                  />
-                </div>
-
+              <VCol
+                cols="12"
+                class="d-flex justify-center"
+              >
                 <VBtn
                   block
                   type="submit"
+                  class="auth-btn"
                 >
-                  Login
+                  {{ $t('Login') }}
                 </VBtn>
-              </VCol>
-
-              <!-- create account -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
-                <span>New on our platform?</span>
-              </VCol>
-              <VCol
-                cols="12"
-                class="d-flex align-center"
-              >
-                <VDivider />
-                <span class="mx-4">or</span>
-                <VDivider />
-              </VCol>
-
-              <!-- auth providers -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
-                <AuthProvider />
               </VCol>
             </VRow>
           </VForm>
         </VCardText>
       </VCard>
-    </VCol>
-  </VRow>
+    </div>
+  </div>
+  <SnackBar ref="snackbar" />
 </template>
 
 <style lang="scss">

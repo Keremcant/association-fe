@@ -1,13 +1,12 @@
 <template>
   <VCard min-height="600px">
     <VCardItem>
-      <VCardTitle>{{ $t('Category') }}</VCardTitle>
+      <VCardTitle>{{ $t('Role') }}</VCardTitle>
       <template #append>
         <VBtn
           icon="tabler-refresh"
           style="margin-right: 3px;"
           size="small"
-          @click="refr"
         />
         <VBtn
           prepend-icon="tabler-plus"
@@ -29,7 +28,7 @@
             <div style="display: flex; align-items: center;">
               <AppTextField
                 v-model="search"
-                :placeholder="$t('Category')"
+                :placeholder="$t('Role')"
                 append-inner-icon="tabler-search"
                 hide-details
                 outlined
@@ -38,7 +37,7 @@
                 class="ms-2"
                 @click="filter"
               >
-                {{ $t('search') }}
+                {{ $t('Search') }}
               </VBtn>
             </div>
           </VCol>
@@ -48,20 +47,38 @@
       <DataTable
         ref="datatable"
         :headers="headers"
-        endpoint="/category/get-all-by-filter"
+        :endpoint="endpoint"
         :payload="payload"
       >
         <template #actions="{item}">
-          <IconBtn @click="() => {selectedCategoryUuid = item.item.uuid; updateDialog = true;}">
+          <IconBtn @click="selectAuthorizedPageVisible=true; selectedRoleId = item.item.id; selectedRole = item.item.name">
+            <VIcon icon="tabler-user-scan" />
+            <VTooltip
+              activator="parent"
+              location="top"
+            >
+              {{ $t('Authorized Pages') }}
+            </VTooltip>
+          </IconBtn>
+          <IconBtn @click="authorizations(item.item.id, item.item.name)">
+            <VIcon icon="tabler-shield-lock" />
+            <VTooltip
+              activator="parent"
+              location="top"
+            >
+              {{ $t('Go Authorizations') }}
+            </VTooltip>
+          </IconBtn>
+          <IconBtn @click="() => {selectedRoleId = item.item.id; updateDialog = true;}">
             <VIcon icon="tabler-edit" />
             <VTooltip
               activator="parent"
               location="top"
             >
-              {{ $t('Edit Category') }}
+              {{ $t('Edit role') }}
             </VTooltip>
           </IconBtn>
-          <IconBtn @click="deleteCategory(item.item.uuid, item.item.name)">
+          <IconBtn @click="deleteRole(item.item.id, item.item.name)">
             <VIcon icon="tabler-trash" />
             <VTooltip
               activator="parent"
@@ -83,14 +100,35 @@
       <DialogCloseBtn @click="createDialog = false" />
       <VCard>
         <VCardTitle class="mt-3">
-          {{ $t('New Category') }}
+          {{ $t('New Role') }}
         </VCardTitle>
         <VCardText>
           <VRow>
             <VCol cols="12">
-              <CategoryForm
+              <RoleForm
                 v-model:is-dialog-visible="createDialog"
-                @saved="categorySaved"
+                @saved="roleSaved"
+              />
+            </VCol>
+          </VRow>
+        </VCardText>
+      </VCard>
+    </VDialog>
+    <VDialog
+      v-model="selectAuthorizedPageVisible"
+      transition="dialog-transition"
+      max-width="700px"
+      max-height="600px"
+    >
+      <DialogCloseBtn @click="selectAuthorizedPageVisible = false" />
+      <VCard>
+        <VCardText>
+          <VRow>
+            <VCol cols="12">
+              <SelectAuthorizedPage
+                :id="selectedRoleId"
+                v-model:is-dialog-visible="selectAuthorizedPageVisible"
+                :role-name="selectedRole"
               />
             </VCol>
           </VRow>
@@ -107,15 +145,15 @@
       <DialogCloseBtn @click="updateDialog = false" />
       <VCard>
         <VCardTitle class="mt-3">
-          {{ $t('Category Update') }}
+          {{ $t('Role Update') }}
         </VCardTitle>
         <VCardText>
           <VRow>
             <VCol cols="12">
-              <CategoryUpdate
+              <RoleUpdate
+                :id="selectedRoleId"
                 v-model:is-dialog-visible="updateDialog"
-                :uuid="selectedCategoryUuid"
-                @saved="categoryUpdated"
+                @saved="roleUpdated"
               />
             </VCol>
           </VRow>
@@ -136,19 +174,27 @@ import DataTable from '@/components/datatable/DataTable.vue'
 import axios from "@/plugins/axios"
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import AppTextField from "@core/components/app-form-elements/AppTextField.vue"
+import { useRouter } from "vue-router"
 
+const props=defineProps({
+  roleName: String,
+})
+
+const router = useRouter()
 const { t } = useI18n()
 const createDialog = ref(false)
 const snackbar = ref()
 const isLoading = ref(false)
 const datatable = ref()
 const confirmDialog = ref()
-const categoryToBeDeletedUuid = ref()
+const roleToBeDeletedId = ref()
 const search = ref('')
-const payload = ref([])
+const payload = ref( [{ key: 'isStaff',  operation: '=', value: true }])
 const updateDialog = ref(false)
-const selectedCategoryUuid = ref()
+const selectedRoleId = ref()
+const endpoint=ref('/user-api/role/get-all-by-filter')
+const selectAuthorizedPageVisible=ref(false)
+const selectedRole = ref()
 
 
 function filter(){
@@ -165,64 +211,52 @@ watch(search, () => {
   }
 })
 
-function deleteCategory(uuid, title){
+function deleteRole(id, title){
 
-  categoryToBeDeletedUuid.value = uuid
+  roleToBeDeletedId.value = id
   confirmDialog.value.show('Delete', `${title}` )
 }
 
-function categoryUpdated(){
+function roleUpdated(){
   datatable.value.refresh()
   updateDialog.value = false
-  snackbar.value.show('Updated Category', 'success')
+  snackbar.value.show('Updated Role', 'success')
+}
+
+function authorizations(id, rName){
+  router.push({ name: 'auth-id', params: { id: id }, query: { nameRole: rName } })
 }
 
 
-
-async function refr() {
-  let response = await datatable.value.refresh()
-  payload.value = []
-  if(response.status!=null){
-    isLoading.value =false
-  }
-}
 
 async function confirmDeletion(){
   isLoading.value = true
 
-  const response = await axios.delete(`/category/${categoryToBeDeletedUuid.value}`)
+  const response = await axios.delete(`/user-api/role/${roleToBeDeletedId.value}`)
   if(response.status >= 200 && response.status < 300){
     confirmDialog.value.hide()
-    snackbar.value.show('Category Deleted', 'success')
+    snackbar.value.show('Role Deleted', 'success')
     datatable.value.refresh()
     isLoading.value = false
   }else{
     snackbar.value.show('anErrorOccurredPleaseTryAgainLater', 'error')
     isLoading.value = true
-    setTimeout(() => {
-      isLoading.value = false
-    }, 500)
   }
 }
 
 
 
-function categorySaved(){
+function roleSaved(){
   datatable.value.refresh()
   createDialog.value = false
-  snackbar.value.show('Category Saved', 'success')
+  snackbar.value.show('Role Saved', 'success')
 }
+
 
 
 const headers = computed(() =>[
   {
-    title: t('Code'),
-    align: 'start',
-    sortable: true,
-    key: 'code',
-  },
-  {
-    title: t('Category'),
+    title: t('Role'),
     align: 'start',
     sortable: true,
     key: 'name',

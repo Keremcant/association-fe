@@ -6,17 +6,9 @@
     <VRow>
       <VCol cols="12">
         <AppTextField
-          v-model="brandCode"
-          :label="$t('Code')"
-          :placeholder="$t('Code')"
-          :rules="[requiredValidator]"
-        />
-      </VCol>
-      <VCol cols="12">
-        <AppTextField
-          v-model="brandName"
-          :label="$t('brand Name')"
-          :placeholder="$t('brand Name')"
+          v-model="roleName"
+          :label="$t('Role')"
+          :placeholder="$t('Role')"
           :rules="[requiredValidator]"
         />
       </VCol>
@@ -43,19 +35,31 @@
   </VForm>
 </template>
 
+
+
 <script setup>
 import { ref } from 'vue'
-import axios from "@/plugins/axios"
+import axios from "@/plugins/axios.js"
 
+
+const props = defineProps({
+  id: Number,
+})
 
 const emits = defineEmits(['saved', 'update:isDialogVisible'])
 
+
 const formRef = ref()
-const brandCode = ref()
 const isLoading = ref(false)
-const brandName = ref()
+const roleName = ref()
+const snackbar = ref()
 
-
+onBeforeMount(async () => {
+  const response = await axios.get(`/user-api/role/${props.id}`)
+  if(response.status >= 200 && response.status < 300){
+    roleName.value = response.data.name
+  }
+})
 
 function resetForm() {
   formRef.value.reset()
@@ -67,18 +71,18 @@ async function onSubmit(){
     if(valid){
 
       const payload = {
-        name: brandName.value,
-        code: brandCode.value,
+        name: roleName.value,
+        isStaff: true,
       }
 
       isLoading.value=true
 
-      const response = await axios.post('/brand/', payload)
+      const response = await axios.put(`/user-api/role/${props.id}`, payload)
       if(response.status >= 200 && response.status < 300){
         emits('saved')
       }else{
         isLoading.value = false
-
+        snackbar.value.show(response.data.error, 'error')
       }
     }
 
