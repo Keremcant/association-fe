@@ -212,6 +212,7 @@ function deleteUser(id, title){
 
 function userUpdated(){
   updateDialog.value = false
+  refr()
   snackbar.value.show('Updated User', 'success')
 }
 

@@ -131,7 +131,6 @@ async function onSubmit(){
       try{
         const response = await axios.put(`/user-api/${props.id}`, payload)
         if(response.status >= 200 && response.status < 300){
-
           emits('saved')
         }else{
           isLoading.value = false
