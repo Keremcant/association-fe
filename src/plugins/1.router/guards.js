@@ -17,7 +17,6 @@ export const setupGuards = router => {
          */
     const isLoggedIn = !!(useCookie('miningData').value && useCookie('miningToken').value)
 
-
     /*
           If user is logged in and is trying to access login like page, redirect to home
           else allow visiting the page
@@ -25,7 +24,7 @@ export const setupGuards = router => {
          */
     if (to.meta.unauthenticatedOnly) {
       if (isLoggedIn)
-        return '/'
+        return '/dashboard/dashboard'
       else
         return undefined
     }

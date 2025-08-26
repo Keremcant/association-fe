@@ -20,7 +20,7 @@
           >
             <VListItem
               v-for="module in moduleList"
-              :key="module.id"
+              :key="module.uuid"
             >
               <VListItemTitle>
                 <VCheckbox
@@ -32,7 +32,7 @@
               <VListItemTitle> {{ module.to }} </VListItemTitle>
               <VListItem
                 v-for="child in module.children"
-                :key="child.id"
+                :key="child.uuid"
                 style="margin-left: 30px"
               >
                 <VCheckbox
@@ -72,10 +72,10 @@
 
 <script setup>
 import { onBeforeMount, ref } from "vue"
-import axios from "@/plugins/axios.js"
+import axios from "@/plugins/axios"
 
 const props = defineProps({
-  id: Number,
+  id: String,
   routeType: String,
   roleName: String,
 })
@@ -94,11 +94,13 @@ async function fetchModules() {
       moduleList.value = response.data.map(e => ({
         checkBox: false,
         id: e.id,
+        uuid: e.uuid,
         title: e.title,
         children: e.children ? e.children.map(c => ({
           checkBox: false,
           id: c.id,
           topId: c.topId,
+          uuid: c.uuid,
           title: c.title,
         })) : [],
       }))
@@ -116,12 +118,12 @@ async function fetchModulesByRole() {
       const module = moduleList.value.find(m => m.id === roleModule.id)
       if (module) {
         module.checkBox = true
-        selectedModule.value.push(module.id)
+        selectedModule.value.push(module.uuid)
         roleModule.children?.forEach(roleChild => {
           const child = module.children.find(c => c.id === roleChild.id)
           if (child) {
             child.checkBox = true
-            selectedModule.value.push(child.id)
+            selectedModule.value.push(child.uuid)
           }
         })
       }
@@ -139,7 +141,7 @@ onBeforeMount(async () => {
 async function onSubmit() {
   await formRef.value.validate().then(async ({ valid }) => {
     if (valid) {
-      const payload = { id: props.id, roleId: props.id, moduleIds: selectedModule.value }
+      const payload = { roleUUID: props.id, moduleUUIDs: selectedModule.value }
 
 
       isLoading.value = true
@@ -159,12 +161,12 @@ async function onSubmit() {
   })
 }
 
-const toggleCheckBox = id => {
-  const index = selectedModule.value.indexOf(id)
+const toggleCheckBox = uuid => {
+  const index = selectedModule.value.indexOf(uuid)
   if (index > -1) {
     selectedModule.value.splice(index, 1)
   } else {
-    selectedModule.value.push(id)
+    selectedModule.value.push(uuid)
   }
 }
 
@@ -176,24 +178,24 @@ function toggleModuleCheckBox(module) {
   if (newCheckBoxValue) {
     module.children.forEach(child => {
       child.checkBox = true
-      toggleCheckBox(child.id)
+      toggleCheckBox(child.uuid)
     })
   } else {
     module.children.forEach(child => {
       child.checkBox = false
 
-      const index = selectedModule.value.indexOf(child.id)
+      const index = selectedModule.value.indexOf(child.uuid)
       if (index > -1) {
         selectedModule.value.splice(index, 1)
       }
     })
   }
-  toggleCheckBox(module.id)
+  toggleCheckBox(module.uuid)
 }
 
 function toggleChildCheckBox(child) {
   child.checkBox = !child.checkBox
-  toggleCheckBox(child.id)
+  toggleCheckBox(child.uuid)
 
   const parentModule = moduleList.value.find(module => module.id === child.topId)
 
@@ -202,7 +204,7 @@ function toggleChildCheckBox(child) {
 
     parentModule.checkBox = !allChildrenUnchecked
 
-    toggleCheckBox(parentModule.id)
+    toggleCheckBox(parentModule.uuid)
   }
 }
 

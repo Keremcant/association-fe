@@ -209,6 +209,30 @@
         "item": "item"
       }
     }
-  }
-  
+  },
+  "Please sign-in to your account": "Please sign-in to your account",
+  "Password": "Password",
+  "Create New Password": "Create New Password",
+  "Please enter your current password and set a new password": "Please enter your current password and set a new password",
+  "Current Password": "Current Password",
+  "New Password": "New Password",
+  "Confirm New Password": "Confirm New Password",
+  "Save New Password": "Save New Password",
+  "Incorrect password or incorrect e-mail. Please Try Again": "Incorrect password or incorrect e-mail. Please Try Again",
+  "Home": "Home",
+  "Profile": "Profile",
+  "Vehicles": "Vehicles",
+  "Index": "Index",
+  "Name": "Name",
+  "Box Id": "Box Id",
+  "Selected Filter Column": "Selected Filter Column",
+  "Column": "Column",
+  "Include": "Include",
+  "Search": "Search",
+  "noData": "noData",
+  "Edit Vehicle": "Edit Vehicle",
+  "Delete": "Delete",
+  "Clear": "Clear",
+  "Excel Export": "Excel Export",
+  "Items per page": "Items per page"
 }

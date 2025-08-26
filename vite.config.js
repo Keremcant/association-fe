@@ -80,7 +80,11 @@ export default defineConfig({
     }),
     svgLoader(),
   ],
-  define: { 'process.env': {} },
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+  },
+  define: { 'process.env': {},  global: 'window' },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

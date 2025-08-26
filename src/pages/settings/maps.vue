@@ -1,7 +1,7 @@
 <template>
   <VCard min-height="600px">
     <VCardItem>
-      <VCardTitle>{{ $t('User') }}</VCardTitle>
+      <VCardTitle>{{ $t('Reference Documents') }}</VCardTitle>
       <template #append>
         <VBtn
           icon="tabler-refresh"
@@ -22,30 +22,39 @@
       <DataTable
         ref="datatable"
         :headers="headers"
-        endpoint="/user-api/get-all-by-filter"
-        excel-endpoint="/user-api/export/excel"
+        endpoint="/maps/get-all-by-filter"
         :payload="payload"
       >
+        <template #status="{ item }">
+          <VChip
+            :color="statusColor(item.item.active)"
+            size="small"
+            label
+            class="text-capitalize"
+          >
+            {{ statusTypeName(item.item.active) }}
+          </VChip>
+        </template>
         <template #actions="{item}">
-          <IconBtn @click="() => {userId = item.item.uuid; updateDialog = true;}">
-            <VIcon icon="tabler-edit" />
+          <IconBtn @click="downloadFile(item.item.uuid, item.item.name)">
+            <VIcon icon="tabler-download" />
             <VTooltip
               activator="parent"
               location="top"
             >
-              {{ $t('Edit User') }}
+              {{ $t('Download') }}
             </VTooltip>
           </IconBtn>
-          <IconBtn @click="() => {selectedUserName = item.item.firstName; selectedUserSurname=item.item.lastName; selectedUserId=item.item.uuid; passwordDialogVisible = true;}">
-            <VIcon icon="tabler-lock" />
+          <IconBtn @click="updateActive(item.item.uuid, item.item.name)">
+            <VIcon icon="tabler-progress-check" />
             <VTooltip
               activator="parent"
               location="top"
             >
-              {{ $t('Password') }}
+              {{ $t('Is Active') }}
             </VTooltip>
           </IconBtn>
-          <IconBtn @click="deleteUser(item.item.uuid, item.item.firstName)">
+          <IconBtn @click="deleteDocument(item.item.uuid, item.item.name)">
             <VIcon icon="tabler-trash" />
             <VTooltip
               activator="parent"
@@ -58,27 +67,6 @@
       </DataTable>
     </VCardItem>
     <VDialog
-      v-model="passwordDialogVisible"
-      transition="dialog-transition"
-      max-width="800px"
-    >
-      <DialogCloseBtn @click="passwordDialogVisible = false" />
-      <VCard>
-        <VCardText>
-          <VRow>
-            <VCol cols="12">
-              <UserPasswordDialog
-                :id="selectedUserId"
-                v-model:is-dialog-visible="passwordDialogVisible"
-                :user-password-dialog-title="fullName"
-                @saved="passwordSaved"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-      </VCard>
-    </VDialog>
-    <VDialog
       v-model="createDialog"
       scrollable
       :overlay="false"
@@ -88,14 +76,14 @@
       <DialogCloseBtn @click="createDialog = false" />
       <VCard>
         <VCardTitle class="mt-3">
-          {{ $t('New User') }}
+          {{ $t('New Document') }}
         </VCardTitle>
         <VCardText>
           <VRow>
             <VCol cols="12">
-              <UserForm
+              <MapsForm
                 v-model:is-dialog-visible="createDialog"
-                @saved="userSaved"
+                @saved="documentSaved"
               />
             </VCol>
           </VRow>
@@ -104,24 +92,23 @@
     </VDialog>
     <VDialog
       v-model="updateDialog"
-      scrollablel
+      scrollable
       :overlay="false"
       transition="dialog-transition"
-
       max-width="600px"
     >
       <DialogCloseBtn @click="updateDialog = false" />
       <VCard>
         <VCardTitle class="mt-3">
-          {{ $t('User Update') }}
+          {{ $t('Document Update') }}
         </VCardTitle>
         <VCardText>
           <VRow>
             <VCol cols="12">
-              <UserUpdate
-                :id="userId"
+              <MapsUpdate
                 v-model:is-dialog-visible="updateDialog"
-                @saved="userUpdated"
+                :uuid="selectedDocumentUuid"
+                @saved="documentUpdated"
               />
             </VCol>
           </VRow>
@@ -133,16 +120,25 @@
       :loading="isLoading"
       @confirm="confirmDeletion"
     />
-    <SnackBar ref="snackbar" />
+    <ConfirmationDialog
+      ref="confirmationDialog"
+      :loading="isLoading"
+      @confirmation="confirmIsActivated"
+    />
   </VCard>
+  <SnackBar ref="snackbar" />
 </template>
 
 <script setup>
 import DataTable from '@/components/datatable/DataTable.vue'
-import axios from "@/plugins/axios.js"
-import { onBeforeMount, ref } from 'vue'
+import axios from "@/plugins/axios"
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import AppTextField from "@core/components/app-form-elements/AppTextField.vue"
+import SnackBar from "@/components/SnackBar.vue"
+import MapsForm from "@/components/settings/map/MapsForm.vue"
+import MapsUpdate from "@/components/settings/map/MapsUpdate.vue"
+import ConfirmDialog2 from "@/components/dialogs/ConfirmDialog2.vue"
+import ConfirmationDialog from "@/components/dialogs/ConfirmationDialog.vue"
 
 const { t } = useI18n()
 const createDialog = ref(false)
@@ -150,23 +146,17 @@ const snackbar = ref()
 const isLoading = ref(false)
 const datatable = ref()
 const confirmDialog = ref()
-const userToBeDeletedId = ref()
+const confirmationDialog = ref()
+const documentToBeDeletedUuid = ref()
 const search = ref('')
 const payload = ref([])
 const updateDialog = ref(false)
-const userId = ref()
-const passwordDialogVisible=ref()
-const selectedUserName=ref()
-const selectedUserSurname=ref()
+const selectedDocumentUuid = ref()
 
-const fullName=ref({
-  userName: selectedUserName,
-  surname: selectedUserSurname,
-})
 
 function filter(){
   if(search.value){
-    payload.value = [{ key: 'firstName', value: search.value, operation: ':' }]
+    payload.value = [{ key: 'name', value: search.value, operation: ':' }]
   }else{
     payload.value = []
   }
@@ -175,26 +165,58 @@ function filter(){
 watch(search, () => {
   if(search.value===''){
     filter()
-  }
+  } 
 })
 
 
-function deleteUser(id, title){
-  userToBeDeletedId.value = id
-  confirmDialog.value.show('Delete', `${title}` )
+const downloadFile = async (uuid, name) => {
+  try {
+    const response = await axios({
+      url: `/maps/file/${uuid}`,
+      method: 'GET',
+      responseType: 'blob',
+    })
 
+    const type = ref(response.data.type.slice(12))
+
+
+    const href = URL.createObjectURL(response.data)
+
+    const link = document.createElement('a')
+
+    link.href = href
+    link.setAttribute('download', `${name}.kml`)
+    document.body.appendChild(link)
+    link.click()
+
+    document.body.removeChild(link)
+    URL.revokeObjectURL(href)
+  } catch (error) {
+    console.error('Dosya indirme hatası:', error)
+  }
 }
 
-function userUpdated(){
+function deleteDocument(uuid, title){
+
+  documentToBeDeletedUuid.value = uuid
+  confirmDialog.value.show('Delete', `${title}` )
+}
+
+function updateActive(uuid, title){
+
+  documentToBeDeletedUuid.value = uuid
+  confirmationDialog.value.show('Is Active', `Should ${title} be active?` )
+}
+
+function documentUpdated(){
+  datatable.value.refresh()
   updateDialog.value = false
-  refr()
-  snackbar.value.show('Updated User', 'success')
+  snackbar.value.show('Updated Document', 'success')
 }
 
 
 
 async function refr() {
-  isLoading.value= true
   let response = await datatable.value.refresh()
   payload.value = []
   if(response.status!=null){
@@ -205,10 +227,10 @@ async function refr() {
 async function confirmDeletion(){
   isLoading.value = true
 
-  const response = await axios.delete(`/user-api/${userToBeDeletedId.value}`)
+  const response = await axios.delete(`/maps/${documentToBeDeletedUuid.value}`)
   if(response.status >= 200 && response.status < 300){
     confirmDialog.value.hide()
-    snackbar.value.show('User Deleted', 'success')
+    snackbar.value.show('Maps Deleted', 'success')
     datatable.value.refresh()
     isLoading.value = false
   }else{
@@ -220,23 +242,50 @@ async function confirmDeletion(){
   }
 }
 
-function userSaved(){
-  datatable.value.refresh()
-  createDialog.value = false
-  snackbar.value.show('User Saved', 'success')
+async function confirmIsActivated(){
+  isLoading.value = true
+
+  const response = await axios.put(`/maps/set-active/${documentToBeDeletedUuid.value}`)
+  if(response.status >= 200 && response.status < 300){
+    confirmationDialog.value.hide()
+    snackbar.value.show('Maps Is Actived', 'success')
+    datatable.value.refresh()
+    isLoading.value = false
+  }else{
+    snackbar.value.show('anErrorOccurredPleaseTryAgainLater', 'error')
+    isLoading.value = true
+  }
 }
 
-function passwordSaved(){
-  datatable.value.refresh()
-  createDialog.value = false
-  snackbar.value.show('Password Saved', 'success')
+function statusColor(status) {
+  if (status === true) {
+    return 'success'
+  }else if(status === false) {
+    return 'error'
+  }
+  else {
+    return 'default-background'
+  }
 }
 
-function roleSaved(){
+const statusTypeName = status => {
+
+  if (status === true) {
+    return 'Aktif'
+  } else {
+    return 'Pasif'
+  }
+}
+
+
+
+function documentSaved(){
   datatable.value.refresh()
   createDialog.value = false
-  snackbar.value.show('Role Saved', 'success')
+  snackbar.value.show('Maps Saved', 'success')
 }
+
+
 
 const headers = computed(() =>[
   {
@@ -246,25 +295,16 @@ const headers = computed(() =>[
     key: 'index',
   },
   {
-    title: t('First Name'),
+    title: t('Map Name'),
     align: 'start',
     sortable: true,
-    type: 'String',
-    key: 'firstName',
+    key: 'name',
   },
   {
-    title: t('Last Name'),
+    title: t('Status'),
     align: 'start',
     sortable: true,
-    type: 'String',
-    key: 'lastName',
-  },
-  {
-    title: t('Email'),
-    align: 'start',
-    sortable: true,
-    type: 'String',
-    key: 'email',
+    key: 'status',
   },
   {
     title: t('Actions'),

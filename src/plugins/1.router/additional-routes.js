@@ -9,12 +9,11 @@ export const redirects = [
     path: '/',
     name: 'index',
     redirect: to => {
-      const userData = useCookie('userData')
+      const userData = useCookie('miningData')
       const userRole = userData.value?.role
 
-
       if(userData.value){
-        if(userRole[0].name === 'ADMIN')
+        if(userRole.name === 'ADMIN')
           return { name: 'dashboard-dashboard' }
       }
 

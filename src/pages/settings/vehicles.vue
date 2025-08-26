@@ -1,12 +1,13 @@
 <template>
   <VCard min-height="600px">
     <VCardItem>
-      <VCardTitle>{{ $t('Role') }}</VCardTitle>
+      <VCardTitle>{{ $t('Vehicles') }}</VCardTitle>
       <template #append>
         <VBtn
           icon="tabler-refresh"
           style="margin-right: 3px;"
           size="small"
+          @click="refr"
         />
         <VBtn
           prepend-icon="tabler-plus"
@@ -21,39 +22,21 @@
       <DataTable
         ref="datatable"
         :headers="headers"
-        :endpoint="endpoint"
-        excel-endpoint="/user-api/role/export/excel"
+        endpoint="/vehicles/get-all-by-filter"
+        excel-endpoint="/vehicles/export/excel"
         :payload="payload"
       >
         <template #actions="{item}">
-          <IconBtn @click="selectAuthorizedPageVisible=true; selectedRoleId = item.item.uuid; selectedRole = item.item.name">
-            <VIcon icon="tabler-user-scan" />
-            <VTooltip
-              activator="parent"
-              location="top"
-            >
-              {{ $t('Authorized Pages') }}
-            </VTooltip>
-          </IconBtn>
-          <IconBtn @click="authorizations(item.item.uuid, item.item.name)">
-            <VIcon icon="tabler-shield-lock" />
-            <VTooltip
-              activator="parent"
-              location="top"
-            >
-              {{ $t('Go Authorizations') }}
-            </VTooltip>
-          </IconBtn>
-          <IconBtn @click="() => {selectedRoleId = item.item.id; updateDialog = true;}">
+          <IconBtn @click="() => {selectedVehicleId = item.item.uuid; updateDialog = true;}">
             <VIcon icon="tabler-edit" />
             <VTooltip
               activator="parent"
               location="top"
             >
-              {{ $t('Edit role') }}
+              {{ $t('Edit Vehicle') }}
             </VTooltip>
           </IconBtn>
-          <IconBtn @click="deleteRole(item.item.id, item.item.name)">
+          <IconBtn @click="deleteVehicle(item.item.uuid, item.item.name)">
             <VIcon icon="tabler-trash" />
             <VTooltip
               activator="parent"
@@ -75,35 +58,14 @@
       <DialogCloseBtn @click="createDialog = false" />
       <VCard>
         <VCardTitle class="mt-3">
-          {{ $t('New Role') }}
+          {{ $t('New Vehicle') }}
         </VCardTitle>
         <VCardText>
           <VRow>
             <VCol cols="12">
-              <RoleForm
+              <VehiclesForm
                 v-model:is-dialog-visible="createDialog"
-                @saved="roleSaved"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-      </VCard>
-    </VDialog>
-    <VDialog
-      v-model="selectAuthorizedPageVisible"
-      transition="dialog-transition"
-      max-width="700px"
-      max-height="600px"
-    >
-      <DialogCloseBtn @click="selectAuthorizedPageVisible = false" />
-      <VCard>
-        <VCardText>
-          <VRow>
-            <VCol cols="12">
-              <SelectAuthorizedPage
-                :id="selectedRoleId"
-                v-model:is-dialog-visible="selectAuthorizedPageVisible"
-                :role-name="selectedRole"
+                @saved="vehicleSaved"
               />
             </VCol>
           </VRow>
@@ -120,15 +82,15 @@
       <DialogCloseBtn @click="updateDialog = false" />
       <VCard>
         <VCardTitle class="mt-3">
-          {{ $t('Role Update') }}
+          {{ $t('Vehicle Update') }}
         </VCardTitle>
         <VCardText>
           <VRow>
             <VCol cols="12">
-              <RoleUpdate
-                :id="selectedRoleId"
+              <VehiclesUpdate
+                :id="selectedVehicleId"
                 v-model:is-dialog-visible="updateDialog"
-                @saved="roleUpdated"
+                @saved="vehicleUpdated"
               />
             </VCol>
           </VRow>
@@ -149,27 +111,20 @@ import DataTable from '@/components/datatable/DataTable.vue'
 import axios from "@/plugins/axios"
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from "vue-router"
+import VehiclesForm from "@/components/settings/vehicles/VehiclesForm.vue"
+import VehiclesUpdate from "@/components/settings/vehicles/VehiclesUpdate.vue"
 
-const props=defineProps({
-  roleName: String,
-})
-
-const router = useRouter()
 const { t } = useI18n()
 const createDialog = ref(false)
 const snackbar = ref()
 const isLoading = ref(false)
 const datatable = ref()
 const confirmDialog = ref()
-const roleToBeDeletedId = ref()
+const restCauseToBeDeletedId = ref()
 const search = ref('')
-const payload = ref( [{ key: 'isStaff',  operation: '=', value: true }])
+const payload = ref([])
 const updateDialog = ref(false)
-const selectedRoleId = ref()
-const endpoint=ref('/user-api/role/get-all-by-filter')
-const selectAuthorizedPageVisible=ref(false)
-const selectedRole = ref()
+const selectedVehicleId = ref()
 
 
 function filter(){
@@ -183,50 +138,57 @@ function filter(){
 watch(search, () => {
   if(search.value===''){
     filter()
-  }
+  } 
 })
 
-function deleteRole(id, title){
+function deleteVehicle(id, title){
 
-  roleToBeDeletedId.value = id
+  restCauseToBeDeletedId.value = id
   confirmDialog.value.show('Delete', `${title}` )
 }
 
-function roleUpdated(){
+function vehicleUpdated(){
   datatable.value.refresh()
   updateDialog.value = false
-  snackbar.value.show('Updated Role', 'success')
-}
-
-function authorizations(id, rName){
-  router.push({ name: 'auth-id', params: { id: id }, query: { nameRole: rName } })
+  snackbar.value.show('Updated Vehicle', 'success')
 }
 
 
+
+async function refr() {
+  let response = await datatable.value.refresh()
+  payload.value = []
+  if(response.status!=null){
+    isLoading.value =false
+  }
+}
 
 async function confirmDeletion(){
   isLoading.value = true
 
-  const response = await axios.delete(`/user-api/role/${roleToBeDeletedId.value}`)
+  const response = await axios.delete(`/vehicles/${restCauseToBeDeletedId.value}`)
   if(response.status >= 200 && response.status < 300){
     confirmDialog.value.hide()
-    snackbar.value.show('Role Deleted', 'success')
+    snackbar.value.show('Vehicle Deleted', 'success')
     datatable.value.refresh()
     isLoading.value = false
   }else{
-    snackbar.value.show('anErrorOccurredPleaseTryAgainLater', 'error')
+    confirmDialog.value.hide()
+    snackbar.value.show(response.data.errorMessage, 'error')
     isLoading.value = true
+    setTimeout(() => {
+      isLoading.value = false
+    }, 500)
   }
 }
 
 
 
-function roleSaved(){
+function vehicleSaved(){
   datatable.value.refresh()
   createDialog.value = false
-  snackbar.value.show('Role Saved', 'success')
+  snackbar.value.show('Vehicle Saved', 'success')
 }
-
 
 
 const headers = computed(() =>[
@@ -237,11 +199,18 @@ const headers = computed(() =>[
     key: 'index',
   },
   {
-    title: t('Role'),
+    title: t('Name'),
     align: 'start',
     sortable: true,
     type: 'String',
     key: 'name',
+  },
+  {
+    title: t('Box Id'),
+    align: 'start',
+    sortable: true,
+    type: 'Number',
+    key: 'boxId',
   },
   {
     title: t('Actions'),
