@@ -17,21 +17,6 @@
           @submit.prevent="onSubmit"
         >
           <VRow>
-            <!-- Current Password -->
-            <VCol
-              cols="12"
-              class="mb-4"
-            >
-              <AppTextField
-                v-model="credentials.currentPassword"
-                :label="$t('Current Password')"
-                :rules="[requiredValidator]"
-                :append-inner-icon="showCurrentPassword ? 'tabler-eye-off' : 'tabler-eye'"
-                :type="showCurrentPassword ? 'text' : 'password'"
-                @click:append-inner="showCurrentPassword = !showCurrentPassword"
-              />
-            </VCol>
-
             <!-- New Password -->
             <VCol
               cols="12"
@@ -106,12 +91,10 @@ const id = ref(route.params.id)
 const router = useRouter()
 
 const credentials = ref({
-  currentPassword: '',
   newPassword: '',
   confirmPassword: '',
 })
 
-const showCurrentPassword = ref(false)
 const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)
 
@@ -123,14 +106,13 @@ const onSubmit = async () => {
   if (refVForm.value.validate()) {
 
     const payload = {
-      oldPassword: btoa(credentials.value.currentPassword), // Base64 encode
       newPassword: btoa(credentials.value.newPassword),
       confirmPassword: btoa(credentials.value.confirmPassword),
     }
 
     isLoading.value = true
 
-    const response = await axios.put(`/user-api/update-password/${id.value}`, payload)
+    const response = await axios.put(`/user-api/update-new-password/${id.value}`, payload)
     if (response.status >= 200 && response.status < 300) {
       isLoading.value = false
       router.push('/login')

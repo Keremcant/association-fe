@@ -205,7 +205,7 @@ function deleteDocument(uuid, title){
 function updateActive(uuid, title){
 
   documentToBeDeletedUuid.value = uuid
-  confirmationDialog.value.show('Is Active', `Should ${title} be active?` )
+  confirmationDialog.value.show('Is Active', `${title} aktif edilsin mi` )
 }
 
 function documentUpdated(){

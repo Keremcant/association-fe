@@ -1,91 +1,3 @@
-<!-- ❗Errors in the form are set on line 60 -->
-<script setup>
-import { VForm } from 'vuetify/components/VForm'
-import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?raw'
-import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?raw'
-import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
-import { themeConfig } from '@themeConfig'
-import axios from "@/plugins/axios"
-// eslint-disable-next-line import/extensions
-import { useAbility } from "@/plugins/casl/composables/useAbility.js"
-
-definePage({
-  meta: {
-    layout: 'blank',
-    unauthenticatedOnly: true,
-  },
-})
-
-const isPasswordVisible = ref(false)
-const route = useRoute()
-const router = useRouter()
-const ability = useAbility()
-
-const errors = ref({
-  email: undefined,
-  password: undefined,
-})
-
-const refVForm = ref()
-
-const credentials = ref({
-  email: '',
-  password: '',
-})
-
-const snackbar = ref()
-
-const login = async () => {
-  try {
-    const encodedPassword = btoa(credentials.value.password)
-
-    const res = await axios.post('/auth/login', {
-      email: credentials.value.email,
-      password: encodedPassword,
-    })
-
-    const { accessToken, userData, userAbilities } = res.data
-
-    // Eğer firstEntry true ise query paramlara bakma, direkt yönlendir
-    if (userData.firstEntry) {
-      router.push({ name: 'first-entry-id', params: { id: userData.id } })
-
-      return
-    }
-
-    // Normal login akışı
-    useCookie('miningAbilityRules').value = userAbilities
-    ability.update(userAbilities)
-
-    if (Array.isArray(userData.role) && userData.role.length === 1) {
-      userData.role = userData.role
-    }
-
-    useCookie('miningData').value = userData
-    useCookie('miningToken').value = accessToken
-
-    await nextTick(() => {
-      const roleRoutes = { 'ADMIN': '/dashboard/dashboard' }
-      const redirectPath = roleRoutes[userData.role.name] || '/dashboard/dashboard'
-
-      // query param varsa normal kullanıcı için kullan, firstEntry için zaten return ettik
-      router.replace(route.query.to ? String(route.query.to) : redirectPath)
-    })
-  } catch (err) {
-    snackbar.value.show('Incorrect password or incorrect e-mail. Please Try Again', 'error')
-  }
-}
-
-
-
-const onSubmit = () => {
-  refVForm.value?.validate().then(({ valid: isValid }) => {
-    if (isValid)
-      login()
-  })
-}
-</script>
-
 <template>
   <div class="auth-wrapper d-flex align-center justify-center pa-4">
     <div class="position-relative my-sm-16">
@@ -172,7 +84,18 @@ const onSubmit = () => {
                   style="min-width: 300px;"
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
                 />
+
+                <div class="d-flex align-center flex-wrap justify-space-between my-6">
+                  <RouterLink
+                    class="text-primary ms-2 mb-1"
+                    :to="{ name: 'forgot-password' }"
+                  >
+                    {{ $t('Forgot Password') }}
+                  </RouterLink>
+                </div>
               </VCol>
+
+
 
               <VCol
                 cols="12"
@@ -194,6 +117,93 @@ const onSubmit = () => {
   </div>
   <SnackBar ref="snackbar" />
 </template>
+
+<script setup>
+import { VForm } from 'vuetify/components/VForm'
+import authV1BottomShape from '@images/svg/auth-v1-bottom-shape.svg?raw'
+import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?raw'
+import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
+import { themeConfig } from '@themeConfig'
+import axios from "@/plugins/axios"
+// eslint-disable-next-line import/extensions
+import { useAbility } from "@/plugins/casl/composables/useAbility.js"
+
+definePage({
+  meta: {
+    layout: 'blank',
+    unauthenticatedOnly: true,
+  },
+})
+
+const isPasswordVisible = ref(false)
+const route = useRoute()
+const router = useRouter()
+const ability = useAbility()
+
+const errors = ref({
+  email: undefined,
+  password: undefined,
+})
+
+const refVForm = ref()
+
+const credentials = ref({
+  email: '',
+  password: '',
+})
+
+const snackbar = ref()
+
+const login = async () => {
+  try {
+    const encodedPassword = btoa(credentials.value.password)
+
+    const res = await axios.post('/auth/login', {
+      email: credentials.value.email,
+      password: encodedPassword,
+    })
+
+    const { accessToken, userData, userAbilities } = res.data
+
+    // Eğer firstEntry true ise query paramlara bakma, direkt yönlendir
+    if (userData.firstEntry) {
+      router.push({ name: 'first-entry-id', params: { id: userData.passwordUUID } })
+
+      return
+    }
+
+    // Normal login akışı
+    useCookie('miningAbilityRules').value = userAbilities
+    ability.update(userAbilities)
+
+    if (Array.isArray(userData.role) && userData.role.length === 1) {
+      userData.role = userData.role
+    }
+
+    useCookie('miningData').value = userData
+    useCookie('miningToken').value = accessToken
+
+    await nextTick(() => {
+      const roleRoutes = { 'ADMIN': '/dashboard/dashboard' }
+      const redirectPath = roleRoutes[userData.role.name] || '/dashboard/dashboard'
+
+      // query param varsa normal kullanıcı için kullan, firstEntry için zaten return ettik
+      router.replace(route.query.to ? String(route.query.to) : redirectPath)
+    })
+  } catch (err) {
+    snackbar.value.show('Incorrect password or incorrect e-mail. Please Try Again', 'error')
+  }
+}
+
+
+
+const onSubmit = () => {
+  refVForm.value?.validate().then(({ valid: isValid }) => {
+    if (isValid)
+      login()
+  })
+}
+</script>
 
 <style lang="scss">
 @use "@core/scss/template/pages/page-auth";

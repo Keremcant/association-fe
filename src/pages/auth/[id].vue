@@ -42,7 +42,7 @@
                         <VCheckbox
                           v-model="child.checkBox"
                           :label="child.title"
-                          @click="toggleChildCheckBox(child)"
+                          @click="toggleChildCheckBox(child, auth)"
                         />
                       </VListItem>
                     </VList>
@@ -87,7 +87,6 @@ const isLoading = ref(false)
 const formRef = ref()
 const snackbar = ref()
 
-console.log(roleName)
 
 async function fetchAuths() {
   try {
@@ -139,6 +138,7 @@ onBeforeMount(async () => {
 })
 
 const toggleCheckBox = uuid => {
+  if (!uuid) return
   const index = selectedAuth.value.indexOf(uuid)
   if (index > -1) {
     selectedAuth.value.splice(index, 1)
@@ -151,48 +151,77 @@ function toggleAuthCheckBox(auth) {
   const newCheckBoxValue = !auth.checkBox
 
   auth.checkBox = newCheckBoxValue
+
   if (newCheckBoxValue) {
+    // Parent seçildiyse parent ekle
+    toggleCheckBox(auth.uuid)
+
+    // Tüm childları seç
     auth.authorizations.forEach(child => {
-      child.checkBox = true
-      toggleCheckBox(child.uuid)
+      if (!child.checkBox) {
+        child.checkBox = true
+        toggleCheckBox(child.uuid)
+      }
     })
   } else {
-    auth.authorizations.forEach(child => {
-      child.checkBox = false
+    // Parent kaldırıldıysa parent'ı sil
+    const index = selectedAuth.value.indexOf(auth.uuid)
+    if (index > -1) selectedAuth.value.splice(index, 1)
 
-      const index = selectedAuth.value.indexOf(child.uuid)
-      if (index > -1) {
-        selectedAuth.value.splice(index, 1)
+    // Tüm childları kaldır
+    auth.authorizations.forEach(child => {
+      if (child.checkBox) {
+        child.checkBox = false
+
+        const idx = selectedAuth.value.indexOf(child.uuid)
+        if (idx > -1) selectedAuth.value.splice(idx, 1)
       }
     })
   }
 }
 
-function toggleChildCheckBox(child) {
+function toggleChildCheckBox(child, parentAuth) {
   child.checkBox = !child.checkBox
   toggleCheckBox(child.uuid)
 
-  const parentauth = authList.value.find(auth => auth.id === child.topId)
+  // Parentı bul
+  const parentauth = parentAuth || authList.value.find(auth =>
+    auth.authorizations.some(c => c.uuid === child.uuid),
+  )
 
   if (parentauth) {
-    const allauthorizationsUnchecked = parentauth.authorizations.every(child => !child.checkBox)
+    const someChecked = parentauth.authorizations.some(c => c.checkBox)
 
-    parentauth.checkBox = !allauthorizationsUnchecked
-    toggleCheckBox(parentauth.uuid)
+    if (someChecked) {
+      // En az 1 child seçiliyse parent işaretli olsun
+      if (!parentauth.checkBox) {
+        parentauth.checkBox = true
+        toggleCheckBox(parentauth.uuid)
+      }
+    } else {
+      // Hiç child kalmadıysa parent'ı kaldır
+      parentauth.checkBox = false
+
+      const idx = selectedAuth.value.indexOf(parentauth.uuid)
+      if (idx > -1) selectedAuth.value.splice(idx, 1)
+    }
   }
 }
 
 async function onSubmit() {
   await formRef.value.validate().then(async ({ valid }) => {
     if (valid) {
-      const payload = { roleUUID: uuid.value, authUUIDs: selectedAuth.value }
+      const payload = {
+        roleUUID: uuid.value,
+        authUUIDs: selectedAuth.value.filter(u => u !== null),
+      }
 
       isLoading.value = true
       try {
         const response = await axios.post(`/user-api/role/save-authorizations-to-role`, payload)
         if (response.status >= 200 && response.status < 300) {
           snackbar.value.show('Yetkiler Güncellendi', 'success')
-        }else if(response.status === 401){
+        } else if(response.status === 401){
           snackbar.value.show('Yetkiniz Bulunmamaktadır', 'error')
         }
       } catch (error) {
