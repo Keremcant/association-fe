@@ -36,7 +36,7 @@
 
         <VCardText>
           <h4 class="text-h4 mb-1">
-            <span class="text-capitalize">mining Admin Panel</span>
+            <span class="text-capitalize">association Admin Panel</span>
           </h4>
           <p class="mb-0">
             {{ $t('Please sign-in to your account') }}
@@ -173,15 +173,15 @@ const login = async () => {
     }
 
     // Normal login akışı
-    useCookie('miningAbilityRules').value = userAbilities
+    useCookie('associationAbilityRules').value = userAbilities
     ability.update(userAbilities)
 
     if (Array.isArray(userData.role) && userData.role.length === 1) {
       userData.role = userData.role
     }
 
-    useCookie('miningData').value = userData
-    useCookie('miningToken').value = accessToken
+    useCookie('associationData').value = userData
+    useCookie('associationToken').value = accessToken
 
     await nextTick(() => {
       const roleRoutes = { 'ADMIN': '/dashboard/dashboard' }

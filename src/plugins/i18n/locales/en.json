@@ -272,5 +272,7 @@
   "Forgot Password": "Forgot Password",
   "Send Reset Link": "Send Reset Link",
   "Enter your email and we ll send you instructions to reset your password": "Enter your email and we ll send you instructions to reset your password",
-  "Back To Login": "Back To Login"
+  "Back To Login": "Back To Login",
+  "No user was found for this email address": "No user was found for this email address",
+  "You have already requested a password reset recently. Please try again in a few minutes": "You have already requested a password reset recently. Please try again in a few minutes"
 }

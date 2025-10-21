@@ -133,5 +133,7 @@
   "Forgot Password": "Şifremi Unuttum",
   "Send Reset Link": "Sıfırlama Bağlantısını Mail Gönder",
   "Enter your email and we ll send you instructions to reset your password": "E-posta adresinizi girin, şifrenizi sıfırlamak için talimatları size göndereceğiz.",
-  "Back To Login": "Giriş Sayfasına Geri Dön"
+  "Back To Login": "Giriş Sayfasına Geri Dön",
+  "No user was found for this email address": "Bu e-posta adresi için hiçbir kullanıcı bulunamadı",
+  "You have already requested a password reset recently. Please try again in a few minutes": "Yakın zamanda bir şifre sıfırlama e-postası gönderildi. Lütfen tekrar denemeden önce birkaç dakika bekleyiniz"
 }

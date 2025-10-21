@@ -14,7 +14,7 @@ const axiosIns = axios.create({
 axiosIns.interceptors.request.use(config => {
 
   // Retrieve token from localStorage
-  const token = useCookie('miningToken').value
+  const token = useCookie('associationToken').value
 
   // If token is found
   if (token) {

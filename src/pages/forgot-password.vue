@@ -64,6 +64,7 @@
                 <VBtn
                   block
                   type="onSubmit"
+                  :loading="isLoading"
                 >
                   {{ $t('Send Reset Link') }}
                 </VBtn>
@@ -89,6 +90,7 @@
       </VCard>
     </div>
   </div>
+  <SnackBar ref="snackbar" />
 </template>
 
 <script setup>
@@ -98,6 +100,8 @@ import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { VForm } from 'vuetify/components/VForm'
 import axios from "@/plugins/axios"
+import { ref } from "vue"
+import SnackBar from "@/components/SnackBar.vue"
 
 definePage({
   meta: {
@@ -109,25 +113,27 @@ definePage({
 const form = ref({ email: '' })
 const refVForm = ref()
 const router = useRouter()
+const snackbar = ref()
+const isLoading = ref(false)
 
 const onSubmit = () => {
   refVForm.value?.validate().then(async ({ valid: isValid }) => {
     if (isValid)
       try {
 
-        const res = await axios.post(`/user-api/send-update-password-mail/${form.value.email}`)
+        isLoading.value = true
 
+        const res = await axios.post(`/user-api/send-update-password-mail/${form.value.email}`)
 
         if (res.status >= 200 && res.status < 300) {
           router.push({ name: 'login' })
         } else {
-          console.error('Dosya yükleme hatası')
+          snackbar.value.show(res.data, 'error')
           isLoading.value = false
         }
 
-
       } catch (err) {
-        snackbar.value.show('Incorrect password or incorrect e-mail. Please Try Again', 'error')
+        isLoading.value = false
       }
   })
 }

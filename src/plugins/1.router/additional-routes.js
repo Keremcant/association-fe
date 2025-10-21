@@ -9,7 +9,7 @@ export const redirects = [
     path: '/',
     name: 'index',
     redirect: to => {
-      const userData = useCookie('miningData')
+      const userData = useCookie('associationData')
       const userRole = userData.value?.role
 
       if(userData.value){

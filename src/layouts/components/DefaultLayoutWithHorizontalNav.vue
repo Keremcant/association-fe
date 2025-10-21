@@ -14,11 +14,11 @@ import { useCookie } from '@/@core/composable/useCookie'
 
 
 const menu = ref([])
-const miningData = useCookie('miningData')
+const associationData = useCookie('associationData')
 
 onBeforeMount(async () => {
   try {
-    const response = await axios.get(`/module/get-module-by-user/${miningData.value.role.uuid}`)
+    const response = await axios.get(`/module/get-module-by-user/${associationData.value.role.uuid}`)
     if (response.status >= 200 && response.status < 300) {
       menu.value = response.data.map(e => {
         const menuItem = {

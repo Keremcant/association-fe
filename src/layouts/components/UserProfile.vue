@@ -10,7 +10,7 @@ const ability = useAbility()
 const { t } = useI18n()
 
 // TODO: Get type from backend
-const userData = useCookie('miningData')
+const userData = useCookie('associationData')
 
 const permissionData=useCookie('permission')
 
@@ -18,7 +18,7 @@ const permissionData=useCookie('permission')
 const logout = async () => {
 
   // Remove "accessToken" from cookie
-  useCookie('miningToken').value = null
+  useCookie('associationToken').value = null
 
   // Remove "userData" from cookie
   userData.value = null
@@ -34,7 +34,7 @@ const logout = async () => {
   // ℹ️ We had to remove abilities in then block because if we don't nav menu items mutation is visible while redirecting user to login page
 
   // Remove "userAbilities" from cookie7
-  useCookie('miningAbilityRules').value = null
+  useCookie('associationAbilityRules').value = null
 
   // Reset ability to initial ability
   ability.update([])
