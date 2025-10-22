@@ -9,12 +9,6 @@
           size="small"
           @click="refr"
         />
-        <VBtn
-          prepend-icon="tabler-plus"
-          @click="createDialog = true"
-        >
-          {{ $t('Add') }}
-        </VBtn>
       </template>
     </VCardItem>
     <VDivider />
