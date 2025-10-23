@@ -1,0 +1,9 @@
+{
+  "Marmara Bölgesi": ["İstanbul", "Edirne", "Kırklareli", "Tekirdağ", "Kocaeli", "Sakarya", "Yalova", "Bursa", "Bilecik", "Balıkesir", "Çanakkale"],
+  "Ege Bölgesi": ["İzmir", "Aydın", "Muğla", "Manisa", "Afyonkarahisar", "Kütahya", "Denizli", "Uşak"],
+  "İç Anadolu Bölgesi": ["Ankara", "Eskişehir", "Konya", "Kayseri", "Sivas", "Kırıkkale", "Aksaray", "Kırşehir", "Nevşehir", "Niğde", "Çankırı", "Karaman", "Yozgat"],
+  "Akdeniz Bölgesi": ["Antalya", "Adana", "Mersin", "Hatay", "Isparta", "Burdur", "Osmaniye", "Kahramanmaraş"],
+  "Karadeniz Bölgesi": ["Samsun", "Ordu", "Giresun", "Trabzon", "Rize", "Artvin", "Sinop", "Kastamonu", "Zonguldak", "Bartın", "Karabük", "Bolu", "Düzce", "Tokat", "Çorum", "Amasya", "Bayburt"],
+  "Doğu Anadolu Bölgesi": ["Erzurum", "Erzincan", "Malatya", "Elazığ", "Ağrı", "Kars", "Iğdır", "Ardahan", "Van", "Bingöl", "Bitlis", "Hakkari", "Muş", "Tunceli"],
+  "Güneydoğu Anadolu Bölgesi": ["Gaziantep", "Şanlıurfa", "Diyarbakır", "Mardin", "Batman", "Siirt", "Adıyaman", "Kilis", "Şırnak"]
+}

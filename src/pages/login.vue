@@ -85,9 +85,15 @@
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
                 />
 
-                <div class="d-flex align-center flex-wrap justify-space-between my-6">
+                <div class="d-flex flex-column align-left my-6">
                   <RouterLink
-                    class="text-primary ms-2 mb-1"
+                    class="text-primary"
+                    :to="{ name: 'register-form' }"
+                  >
+                    {{ $t('Register') }}
+                  </RouterLink>
+                  <RouterLink
+                    class="text-primary"
                     :to="{ name: 'forgot-password' }"
                   >
                     {{ $t('Forgot Password') }}
