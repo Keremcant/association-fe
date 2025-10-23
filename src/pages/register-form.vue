@@ -264,7 +264,7 @@ const snackbar = ref()
 const isLoading = ref(false)
 const { t } = useI18n()
 const regionCityMap = regionsData
-const regions = Object.keys(regionCityMap)
+const router = useRouter()
 const cities = ref([])
 
 watch(() => form.value.region, newRegion => {
@@ -342,16 +342,33 @@ const onSubmit = async () => {
   const { valid } = await formRef.value.validate()
   if (!valid) return
   isLoading.value = true
+
+  const payload = {
+    username: form.value.userEmail,
+    firstName: form.value.firstName,
+    lastName: form.value.lastName,
+    gsm: form.value.phone,
+    identityNumber: form.value.nationalId,
+    email: form.value.userEmail,
+    institutionName: form.value.companyName,
+    institutionRegion: form.value.region,
+    institutionProvince: form.value.city,
+    institutionPhone: form.value.companyPhone,
+    institutionAddress: form.value.workAddress,
+    institutionMail: form.value.companyEmail,
+  }
+
   try {
-    await axios.post("/api/applicants", form.value)
+    await axios.post("/user-api/create-user", payload)
     snackbar.value.show("Application submitted successfully", "success")
-    resetForm()
+    router.push({ name: 'login' })
   } catch (err) {
     snackbar.value.show(err.response?.data?.message || "Submission failed", "error")
   } finally {
     isLoading.value = false
   }
 }
+
 
 const resetForm = () => {
   form.value = { firstName: "", lastName: "", nationalId: "", region: "", city: "", workAddress: "", companyName: "", companyPhone: "", companyEmail: "", phone: "", userEmail: "" }

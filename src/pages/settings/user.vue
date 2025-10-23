@@ -21,24 +21,6 @@
         :payload="payload"
       >
         <template #actions="{item}">
-          <IconBtn @click="() => {userId = item.item.uuid; updateDialog = true;}">
-            <VIcon icon="tabler-edit" />
-            <VTooltip
-              activator="parent"
-              location="top"
-            >
-              {{ $t('Edit User') }}
-            </VTooltip>
-          </IconBtn>
-          <IconBtn @click="() => {selectedUserName = item.item.firstName; selectedUserSurname=item.item.lastName; selectedUserId=item.item.uuid; passwordDialogVisible = true;}">
-            <VIcon icon="tabler-lock" />
-            <VTooltip
-              activator="parent"
-              location="top"
-            >
-              {{ $t('Password') }}
-            </VTooltip>
-          </IconBtn>
           <IconBtn @click="deleteUser(item.item.uuid, item.item.firstName)">
             <VIcon icon="tabler-trash" />
             <VTooltip
@@ -49,79 +31,18 @@
             </VTooltip>
           </IconBtn>
         </template>
+        <template #status="{ item }">
+          <VChip
+            :color="statusColor(item.item.isEnable)"
+            size="small"
+            label
+            class="text-capitalize"
+          >
+            {{ statusName(item.item.isEnable) }}
+          </VChip>
+        </template>
       </DataTable>
     </VCardItem>
-    <VDialog
-      v-model="passwordDialogVisible"
-      transition="dialog-transition"
-      max-width="800px"
-    >
-      <DialogCloseBtn @click="passwordDialogVisible = false" />
-      <VCard>
-        <VCardText>
-          <VRow>
-            <VCol cols="12">
-              <UserPasswordDialog
-                :id="selectedUserId"
-                v-model:is-dialog-visible="passwordDialogVisible"
-                :user-password-dialog-title="fullName"
-                @saved="passwordSaved"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-      </VCard>
-    </VDialog>
-    <VDialog
-      v-model="createDialog"
-      scrollable
-      :overlay="false"
-      max-width="600px"
-      transition="dialog-transition"
-    >
-      <DialogCloseBtn @click="createDialog = false" />
-      <VCard>
-        <VCardTitle class="mt-3">
-          {{ $t('New User') }}
-        </VCardTitle>
-        <VCardText>
-          <VRow>
-            <VCol cols="12">
-              <UserForm
-                v-model:is-dialog-visible="createDialog"
-                @saved="userSaved"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-      </VCard>
-    </VDialog>
-    <VDialog
-      v-model="updateDialog"
-      scrollablel
-      :overlay="false"
-      transition="dialog-transition"
-
-      max-width="600px"
-    >
-      <DialogCloseBtn @click="updateDialog = false" />
-      <VCard>
-        <VCardTitle class="mt-3">
-          {{ $t('User Update') }}
-        </VCardTitle>
-        <VCardText>
-          <VRow>
-            <VCol cols="12">
-              <UserUpdate
-                :id="userId"
-                v-model:is-dialog-visible="updateDialog"
-                @saved="userUpdated"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-      </VCard>
-    </VDialog>
     <ConfirmDialog2
       ref="confirmDialog"
       :loading="isLoading"
@@ -148,15 +69,6 @@ const userToBeDeletedId = ref()
 const search = ref('')
 const payload = ref([])
 const updateDialog = ref(false)
-const userId = ref()
-const passwordDialogVisible=ref()
-const selectedUserName=ref()
-const selectedUserSurname=ref()
-
-const fullName=ref({
-  userName: selectedUserName,
-  surname: selectedUserSurname,
-})
 
 function filter(){
   if(search.value){
@@ -178,14 +90,6 @@ function deleteUser(id, title){
   confirmDialog.value.show('Delete', `${title}` )
 
 }
-
-function userUpdated(){
-  updateDialog.value = false
-  refr()
-  snackbar.value.show('Updated User', 'success')
-}
-
-
 
 async function refr() {
   isLoading.value= true
@@ -214,22 +118,25 @@ async function confirmDeletion(){
   }
 }
 
-function userSaved(){
-  datatable.value.refresh()
-  createDialog.value = false
-  snackbar.value.show('User Saved', 'success')
+function statusColor(status) {
+  if (status === false) {
+    return 'error'
+  }
+  else if (status === true) {
+    return 'success'
+  }
+  else {
+    return 'default-background'
+  }
 }
 
-function passwordSaved(){
-  datatable.value.refresh()
-  createDialog.value = false
-  snackbar.value.show('Password Saved', 'success')
-}
 
-function roleSaved(){
-  datatable.value.refresh()
-  createDialog.value = false
-  snackbar.value.show('Role Saved', 'success')
+const statusName = status => {
+  if (status === false) {
+    return 'ONAYLANMADI'
+  } else {
+    return 'ONAYLANDI'
+  }
 }
 
 const headers = computed(() =>[
@@ -259,6 +166,19 @@ const headers = computed(() =>[
     sortable: true,
     type: 'String',
     key: 'email',
+  },
+  {
+    title: t('Phone'),
+    align: 'start',
+    sortable: true,
+    type: 'String',
+    key: 'gsm',
+  },
+  {
+    title: t('Status'),
+    align: 'start',
+    sortable: true,
+    key: 'status',
   },
   {
     title: t('Actions'),
