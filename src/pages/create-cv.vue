@@ -132,7 +132,7 @@
                 <AppAutocomplete
                   v-model="form.title"
                   :items="[$t('Caregiver'), $t('Cleaning Staff'), $t('Chef'), $t('Assistant Chef'), $t('Security Staff'), $t('Driver')]"
-                  :label="$t('Title')"
+                  :label="$t('Appellation')"
                   :rules="[requiredValidator]"
                 />
               </VCol>
