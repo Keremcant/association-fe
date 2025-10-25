@@ -95,13 +95,13 @@ async function refresh() {
 
 function deleteOpinion(id) {
   selectedId.value = id
-  confirmDialog.value.show(t('Delete'), t('Are you sure you want to delete this opinion?'))
+  confirmDialog.value.show(t('Delete'))
 }
 
 async function confirmDeletion() {
   isLoading.value = true
 
-  const res = await axios.delete(`/ministry-opinions-api/${selectedId.value}`)
+  const res = await axios.delete(`/ministryopinions/${selectedId.value}`)
   if (res.status >= 200 && res.status < 300) {
     confirmDialog.value.hide()
     snackbar.value.show(t('Deleted successfully'), 'success')

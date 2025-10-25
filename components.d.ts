@@ -51,6 +51,7 @@ declare module 'vue' {
     I18n: typeof import('./src/@core/components/I18n.vue')['default']
     MealListForm: typeof import('./src/components/settings/monthly-meal-list/MealListForm.vue')['default']
     MealListUpdate: typeof import('./src/components/settings/monthly-meal-list/MealListUpdate.vue')['default']
+    MemberDebtListForm: typeof import('./src/components/settings/member-debt-list/MemberDebtListForm.vue')['default']
     MinistryOpinionsForm: typeof import('./src/components/settings/ministry-opinions/MinistryOpinionsForm.vue')['default']
     MinistryOpinionsUpdate: typeof import('./src/components/settings/ministry-opinions/MinistryOpinionsUpdate.vue')['default']
     MoreBtn: typeof import('./src/@core/components/MoreBtn.vue')['default']

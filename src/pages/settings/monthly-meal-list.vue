@@ -137,7 +137,7 @@ async function refresh() {
 
 function deleteMeal(id) {
   selectedId.value = id
-  confirmDialog.value.show(t('Delete'), t('Are you sure you want to delete this meal list?'))
+  confirmDialog.value.show(t('Delete'))
 }
 
 async function confirmDeletion() {
