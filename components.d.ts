@@ -75,11 +75,10 @@ declare module 'vue' {
     ThemeSwitcher: typeof import('./src/@core/components/ThemeSwitcher.vue')['default']
     TiptapEditor: typeof import('./src/@core/components/TiptapEditor.vue')['default']
     TwoFactorAuthDialog: typeof import('./src/components/dialogs/TwoFactorAuthDialog.vue')['default']
-    UserForm: typeof import('./src/components/ministry-opinions/UserForm.vue')['default']
+    UserForm: typeof import('./src/components/settings/user/UserForm.vue')['default']
     UserInfoEditDialog: typeof import('./src/components/dialogs/UserInfoEditDialog.vue')['default']
     UserPasswordDialog: typeof import('./src/components/settings/user/UserPasswordDialog.vue')['default']
     UserUpdate: typeof import('./src/components/settings/user/UserUpdate.vue')['default']
     UserUpgradePlanDialog: typeof import('./src/components/dialogs/UserUpgradePlanDialog.vue')['default']
-    VueApexCharts: typeof import('vue3-apexcharts')['default']
   }
 }
