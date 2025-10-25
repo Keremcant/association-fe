@@ -30,6 +30,18 @@
               {{ $t('Delete') }}
             </VTooltip>
           </IconBtn>
+          <IconBtn
+            :disabled="isSendingMail"
+            @click="sendUserMail(item.item.uuid)"
+          >
+            <VIcon icon="tabler-user-check" />
+            <VTooltip
+              activator="parent"
+              location="top"
+            >
+              {{ $t('Kullanıcıyı Aktifleştir / Pasifleştir') }}
+            </VTooltip>
+          </IconBtn>
         </template>
         <template #status="{ item }">
           <VChip
@@ -68,7 +80,7 @@ const confirmDialog = ref()
 const userToBeDeletedId = ref()
 const search = ref('')
 const payload = ref([])
-const updateDialog = ref(false)
+const isSendingMail = ref(false)
 
 function filter(){
   if(search.value){
@@ -127,6 +139,24 @@ function statusColor(status) {
   }
   else {
     return 'default-background'
+  }
+}
+
+const sendUserMail = async uuid => {
+  if (isSendingMail.value) return // Eğer işlem devam ediyorsa geri dön
+
+  isSendingMail.value = true // Butonu devre dışı bırak
+  try {
+    const response = await axios.post(`/user-api/${uuid}/toggle`)
+    if(response.status >= 200 && response.status < 300){
+      snackbar.value.show('Kullanıcı durumu değiştirildi', 'success')
+      datatable.value.refresh()
+    }
+  } catch (error) {
+    snackbar.value.show('İşlem sırasında bir hata oluştu', 'error')
+    console.error(error)
+  } finally {
+    isSendingMail.value = false // İşlem bitti, butonu tekrar aktif et
   }
 }
 
