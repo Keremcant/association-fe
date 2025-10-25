@@ -17,13 +17,11 @@
       <!-- Tags -->
       <VCol cols="12">
         <AppAutocomplete
-          v-model="tags"
+          v-model="selectedTag"
           :label="$t('Tags')"
-          :items="items"
-          :placeholder="$t('Enter the tags')"
-          chips
-          multiple
-          closable-chips
+          :placeholder="$t('Tags')"
+          :items="tags"
+          :rules="[requiredValidator]"
         />
       </VCol>
 
@@ -88,20 +86,30 @@ const formRef = ref()
 const snackbar = ref()
 const isLoading = ref(false)
 const title = ref('')
-const tags = ref()
+const tags = ref([])
 const decisionDate = ref('')
 const file = ref(null)
-
-const items = [
-  '#Teşvik',
-  '#Ödeme',
-  '#Yüzdelik',
-]
+const selectedTag = ref()
 
 function resetForm() {
   formRef.value.reset()
   emits('update:isDialogVisible', false)
 }
+
+onBeforeMount( async ()=> {
+
+  await tagsCall()
+
+})
+
+async function tagsCall(){
+  const tagsCall = await axios.post('/tags/search-autocomplete-filter', { filters: [], pageNumber: 0, pageSize: 1000 })
+  if(tagsCall.status >= 200 && tagsCall.status < 300){
+    tags.value=tagsCall.data.map(e => {
+      return { title: e.label, value: e.value, disabled: false }})
+  }
+}
+
 
 async function onSubmit() {
   formRef.value.validate().then(async ({ valid }) => {
@@ -110,13 +118,13 @@ async function onSubmit() {
     const formData = new FormData()
 
     formData.append('title', title.value)
-    formData.append('tags', tags.value)
+    formData.append('tags', selectedTag.value)
     formData.append('decisionDate', decisionDate.value)
     formData.append('file', file.value)
 
     isLoading.value = true
     try {
-      const response = await axios.post('/ministry-opinions-api/create', formData)
+      const response = await axios.post('/ministryopinions/', formData)
 
       if (response.status >= 200 && response.status < 300) {
         snackbar.value.show(t('Saved successfully'), 'success')

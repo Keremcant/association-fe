@@ -25,13 +25,10 @@
       <DataTable
         ref="datatable"
         :headers="headers"
-        endpoint="/ministry-opinions-api/get-all"
+        endpoint="/ministryopinions/get-all-by-filter"
         :payload="payload"
       >
         <template #actions="{ item }">
-          <IconBtn @click="() => { selectedId = item.item.uuid; updateDialog = true }">
-            <VIcon icon="tabler-edit" />
-          </IconBtn>
           <IconBtn @click="deleteOpinion(item.item.uuid)">
             <VIcon icon="tabler-trash" />
           </IconBtn>
@@ -56,31 +53,6 @@
               <OpinionForm
                 v-model:is-dialog-visible="createDialog"
                 @saved="created"
-              />
-            </VCol>
-          </VRow>
-        </VCardText>
-      </VCard>
-    </VDialog>
-
-    <VDialog
-      v-model="updateDialog"
-      scrollable
-      max-width="600px"
-      transition="dialog-transition"
-    >
-      <DialogCloseBtn @click="updateDialog = false" />
-      <VCard>
-        <VCardTitle class="mt-3">
-          {{ $t('Update Ministry Opinion') }}
-        </VCardTitle>
-        <VCardText>
-          <VRow>
-            <VCol cols="12">
-              <OpinionUpdateForm
-                :id="selectedId"
-                v-model:is-dialog-visible="updateDialog"
-                @saved="updated"
               />
             </VCol>
           </VRow>
@@ -144,11 +116,6 @@ function created() {
   snackbar.value.show(t('Saved successfully'), 'success')
 }
 
-function updated() {
-  updateDialog.value = false
-  datatable.value.refresh()
-  snackbar.value.show(t('Updated successfully'), 'success')
-}
 
 const headers = computed(() => [
   { title: t('Title'), key: 'title', sortable: true },
