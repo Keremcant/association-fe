@@ -14,19 +14,20 @@
     <VDivider />
 
     <VCardItem>
-      <VDataTable
+      <DataTable
+        ref="datatable"
         :headers="headers"
-        :items="tableData"
-        class="elevation-1"
+        endpoint="/ministryopinions/get-all-by-filter"
+        :payload="payload"
       >
-        <template #item.actions="{ item }">
+        <template #actions="{ item }">
           <VBtn
             icon="tabler-eye"
             variant="text"
-            @click="showCv(item)"
+            @click="showCv(item.item.uuid)"
           />
         </template>
-      </VDataTable>
+      </DataTable>
     </VCardItem>
 
     <VDialog
@@ -36,9 +37,9 @@
       transition="dialog-transition"
     >
       <DialogCloseBtn @click="updateDialog = false" />
-      <VCard v-if="showCvData">
-        <UserForm
-          :form-data="showCvData"
+      <VCard>
+        <MinistryOpinionsShow
+          :uuid="selectedUUID"
           @close="updateDialog = false"
         />
       </VCard>
@@ -49,36 +50,25 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import UserForm from '@/components/ministry-opinions/UserForm.vue'
+import MinistryOpinionsShow from '@/components/ministry-opinions/MinistryOpinionsShow.vue'
+import DataTable from "@/components/datatable/DataTable.vue"
 
 const { t } = useI18n()
 
 const updateDialog = ref(false)
-const showCvData = ref(null)
+const selectedUUID = ref()
+const payload = ref([])
+const datatable = ref()
 
-const tableData = ref([
-  {
-    title: 'Software Engineer Approval',
-    tags: 'Engineering, IT',
-    decisionDate: '2025-10-20',
-    pdfUrl: '/pdfs/test1.pdf',
-  },
-  {
-    title: 'Design Review',
-    tags: 'Architecture',
-    decisionDate: '2025-10-22',
-    pdfUrl: '/pdfs/test2.pdf',
-  },
-])
 
 async function refresh() {
-  isLoading.value = true
   await datatable.value.refresh()
-  isLoading.value = false
 }
 
 function showCv(item) {
-  showCvData.value = { ...item }
+  console.log(item)
+  selectedUUID.value = item
+
   updateDialog.value = true
 }
 

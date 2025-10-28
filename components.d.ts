@@ -53,6 +53,7 @@ declare module 'vue' {
     MealListUpdate: typeof import('./src/components/settings/monthly-meal-list/MealListUpdate.vue')['default']
     MemberDebtListForm: typeof import('./src/components/settings/member-debt-list/MemberDebtListForm.vue')['default']
     MinistryOpinionsForm: typeof import('./src/components/settings/ministry-opinions/MinistryOpinionsForm.vue')['default']
+    MinistryOpinionsShow: typeof import('./src/components/ministry-opinions/MinistryOpinionsShow.vue')['default']
     MinistryOpinionsUpdate: typeof import('./src/components/settings/ministry-opinions/MinistryOpinionsUpdate.vue')['default']
     MoreBtn: typeof import('./src/@core/components/MoreBtn.vue')['default']
     Notifications: typeof import('./src/@core/components/Notifications.vue')['default']
@@ -81,5 +82,6 @@ declare module 'vue' {
     UserPasswordDialog: typeof import('./src/components/settings/user/UserPasswordDialog.vue')['default']
     UserUpdate: typeof import('./src/components/settings/user/UserUpdate.vue')['default']
     UserUpgradePlanDialog: typeof import('./src/components/dialogs/UserUpgradePlanDialog.vue')['default']
+    VueApexCharts: typeof import('vue3-apexcharts')['default']
   }
 }

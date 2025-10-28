@@ -35,12 +35,12 @@
         />
       </VCol>
 
-      <!-- File Upload -->
+      <!-- File Upload (PDF only) -->
       <VCol cols="12">
         <VFileInput
           v-model="file"
-          :label="$t('File')"
-          accept=".pdf,.doc,.docx"
+          :label="$t('File (PDF only)')"
+          accept=".pdf"
           :rules="[requiredValidator]"
         />
       </VCol>
@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import axios from '@/plugins/axios.js'
 
@@ -96,30 +96,42 @@ function resetForm() {
   emits('update:isDialogVisible', false)
 }
 
-onBeforeMount( async ()=> {
-
+onBeforeMount(async () => {
   await tagsCall()
-
 })
 
-async function tagsCall(){
-  const tagsCall = await axios.post('/tags/search-autocomplete-filter', { filters: [], pageNumber: 0, pageSize: 1000 })
-  if(tagsCall.status >= 200 && tagsCall.status < 300){
-    tags.value=tagsCall.data.map(e => {
-      return { title: e.label, value: e.value, disabled: false }})
+async function tagsCall() {
+  const res = await axios.post('/tags/search-autocomplete-filter', { filters: [], pageNumber: 0, pageSize: 1000 })
+  if (res.status >= 200 && res.status < 300) {
+    tags.value = res.data.map(e => ({ title: e.label, value: e.value }))
   }
 }
-
 
 async function onSubmit() {
   formRef.value.validate().then(async ({ valid }) => {
     if (!valid) return
 
+    // PDF kontrolü
+    if (!file.value) {
+      snackbar.value.show(t('File is required'), 'error')
+      
+      return
+    }
+    if (file.value.type !== 'application/pdf') {
+      snackbar.value.show(t('Only PDF files are allowed'), 'error')
+      
+      return
+    }
+
     const formData = new FormData()
 
     formData.append('title', title.value)
     formData.append('tags', selectedTag.value)
-    formData.append('decisionDate', decisionDate.value)
+
+    const formattedDate = decisionDate.value
+
+    formData.append('decisionDate', formattedDate)
+
     formData.append('file', file.value)
 
     isLoading.value = true
