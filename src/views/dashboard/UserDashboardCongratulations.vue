@@ -7,7 +7,7 @@
             Merhaba Doğaç
           </h5>
           <p class="mb-2">
-            Toplam Borç Tutarı
+            Güncel Borç Tutarı
           </p>
           <h4 class="text-h4 text-primary mb-1">
             10.000 TL
