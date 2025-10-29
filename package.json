@@ -37,6 +37,7 @@
     "destr": "2.0.3",
     "eslint-plugin-regexp": "2.7.0",
     "jwt-decode": "4.0.0",
+    "luxon": "^3.7.2",
     "mapbox-gl": "3.5.2",
     "ofetch": "1.4.1",
     "pdf-vue3": "^1.0.12",

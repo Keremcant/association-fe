@@ -274,5 +274,8 @@
   "Enter Explanation": "Açıklama girin",
   "Upload": "Yükle",
   "Upload Member Debt Excel": "Üye Borçları Excel Dosyasını Yükle",
-  "Number of Institutions": "Kurum Sayısı"
+  "Number of Institutions": "Kurum Sayısı",
+  "File (PDF only)": "Dosya (Sadece PDF)",
+  "PDF yüklenemedi": "PDF dosyası yüklenemedi.",
+  "User Dashboard": "Kullanıcı Ana Sayfa*"
 }

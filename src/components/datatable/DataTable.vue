@@ -98,6 +98,13 @@
           :item="{ item }"
         />
       </template>
+
+      <template #[`item.DateTime`]="{ item }">
+        <slot
+          name="DateTime"
+          :item="{ item }"
+        />
+      </template>
     </VDataTableServer>
   </div>
 </template>
