@@ -66,7 +66,6 @@ async function refresh() {
 }
 
 function showCv(item) {
-  console.log(item)
   selectedUUID.value = item
 
   updateDialog.value = true
@@ -74,8 +73,8 @@ function showCv(item) {
 
 const headers = computed(() => [
   { title: t('Title'), key: 'title' },
-  { title: t('Tags'), key: 'tags' },
-  { title: t('Decision Date'), key: 'decisionDate' },
+  { title: t('Tags'), key: 'tagsAsString' },
+  { title: t('Decision Date'), key: 'decisionDate', value: item => item.decisionDate ? item.decisionDate.split('T')[0] : '' },
   { title: t('Actions'), key: 'actions', sortable: false },
 ])
 </script>

@@ -160,8 +160,8 @@ function created() {
 
 const headers = computed(() => [
   { title: t('Year'), key: 'year', sortable: true },
-  { title: t('Month'), key: t('month'), sortable: true },
-  { title: t('Region'), key: t('region'), sortable: true },
+  { title: t('Month'), key: 'month', sortable: true },
+  { title: t('Region'), key: 'region', sortable: true },
   { title: t('Actions'), key: 'actions', sortable: false },
 ])
 </script>

@@ -16,12 +16,14 @@
 
       <!-- Tags -->
       <VCol cols="12">
-        <AppAutocomplete
+        <AppSelect
           v-model="selectedTag"
           :label="$t('Tags')"
           :placeholder="$t('Tags')"
           :items="tags"
           :rules="[requiredValidator]"
+          multiple
+          persistent-hint
         />
       </VCol>
 
@@ -128,7 +130,8 @@ async function onSubmit() {
     formData.append('title', title.value)
     formData.append('tags', selectedTag.value)
 
-    const formattedDate = decisionDate.value
+    const formattedDate = decisionDate.value.split('T')[0]
+
 
     formData.append('decisionDate', formattedDate)
 

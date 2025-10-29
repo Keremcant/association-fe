@@ -119,9 +119,8 @@ function created() {
 
 const headers = computed(() => [
   { title: t('Title'), key: 'title', sortable: true },
-  { title: t('Tags'), key: 'tags', sortable: false },
-  { title: t('Decision Date'), key: 'decisionDate', sortable: true },
-  { title: t('File'), key: 'fileName', sortable: false },
+  { title: t('Tags'), key: 'tagsAsString', sortable: false },
+  { title: t('Decision Date'), key: 'decisionDate', sortable: true, value: item => item.decisionDate ? item.decisionDate.split('T')[0] : '' },
   { title: t('Actions'), key: 'actions', sortable: false },
 ])
 </script>

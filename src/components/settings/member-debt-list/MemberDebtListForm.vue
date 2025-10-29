@@ -4,14 +4,7 @@
     @submit.prevent="onSubmit"
   >
     <VRow>
-      <VCol cols="12">
-        <AppTextField
-          v-model="title"
-          :label="$t('Explanation')"
-          :placeholder="$t('Enter Explanation')"
-          :rules="[requiredValidator]"
-        />
-      </VCol>
+      <!-- Excel Dosyası -->
       <VCol cols="12">
         <VFileInput
           v-model="file"
@@ -20,6 +13,8 @@
           :rules="[requiredValidator]"
         />
       </VCol>
+
+      <!-- Butonlar -->
       <VCol
         cols="12"
         class="text-right"
@@ -40,12 +35,14 @@
         </VBtn>
       </VCol>
     </VRow>
+
     <SnackBar ref="snackbar" />
   </VForm>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import axios from '@/plugins/axios.js' // axios import
 
 const emits = defineEmits(['saved', 'update:isDialogVisible'])
 const formRef = ref()
@@ -62,22 +59,34 @@ function resetForm() {
 async function onSubmit() {
   formRef.value.validate().then(async ({ valid }) => {
     if (!valid) return
+    if (!file.value) {
+      snackbar.value.show('Excel file is required', 'error')
+      
+      return
+    }
+
     isLoading.value = true
 
     try {
-      // Mock Excel veri
-      const payload = [
-        { phone: '05312347447', amount: 45000, uploadedAt: new Date().toLocaleString(), uploadedBy: 'User 1' },
-        { phone: '05414785987', amount: 100000, uploadedAt: new Date().toLocaleString(), uploadedBy: 'User 1' },
-        { phone: '05322347447', amount: 7500, uploadedAt: new Date().toLocaleString(), uploadedBy: 'User 1' },
-        { phone: '05314785987', amount: 1000, uploadedAt: new Date().toLocaleString(), uploadedBy: 'User 1' },
-      ]
+      const formData = new FormData()
 
-      emits('saved', payload)
-      emits('update:isDialogVisible', false)
-      isLoading.value = false
+      formData.append('file', file.value)
+
+      const response = await axios.post('/memberdebtlist/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      if (response.status >= 200 && response.status < 300) {
+        snackbar.value.show('Excel uploaded successfully', 'success')
+        emits('saved', response.data) // backend’den dönen listeyi gönder
+        emits('update:isDialogVisible', false)
+      } else {
+        snackbar.value.show('Upload failed', 'error')
+      }
     } catch (error) {
       console.error(error)
+      snackbar.value.show(error.response?.data?.message || 'Upload failed', 'error')
+    } finally {
       isLoading.value = false
     }
   })

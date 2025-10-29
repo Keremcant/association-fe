@@ -2,47 +2,8 @@
   <VCard min-height="600px">
     <VCardItem>
       <VCardTitle>{{ $t('Role') }}</VCardTitle>
-      <template #append>
-        <VBtn
-          icon="tabler-refresh"
-          style="margin-right: 3px;"
-          size="small"
-        />
-        <VBtn
-          prepend-icon="tabler-plus"
-          @click="createDialog = true"
-        >
-          {{ $t('Add') }}
-        </VBtn>
-      </template>
     </VCardItem>
-    <VDivider />
     <VCardItem>
-      <VCardText style="padding: 0 24px 24px 24px">
-        <VRow>
-          <VCol
-            cols="12"
-            offset-md="8"
-            md="4"
-          >
-            <div style="display: flex; align-items: center;">
-              <AppTextField
-                v-model="search"
-                :placeholder="$t('Role')"
-                append-inner-icon="tabler-search"
-                hide-details
-                outlined
-              />
-              <VBtn
-                class="ms-2"
-                @click="filter"
-              >
-                {{ $t('Search') }}
-              </VBtn>
-            </div>
-          </VCol>
-        </VRow>
-      </VCardText>
       <VDivider />
       <DataTable
         ref="datatable"

@@ -411,5 +411,9 @@
   "Explanation": "Explanation",
   "Enter Explanation": "Enter Explanation",
   "Upload": "Upload",
-  "Upload Member Debt Excel": "Upload Member Debt Excel"
+  "Upload Member Debt Excel": "Upload Member Debt Excel",
+  "Number of Institutions": "Number of Institutions",
+  "File (PDF only)": "File (PDF only)",
+  "PDF yüklenemedi": "The PDF could not be loaded.",
+  "User Dashboard": "User Dashboard"
 }

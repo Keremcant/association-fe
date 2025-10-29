@@ -17,7 +17,6 @@
         </VBtn>
       </template>
     </VCardItem>
-    <VDivider />
     <VCardItem>
       <VDivider />
       <DataTable

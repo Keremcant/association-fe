@@ -17,9 +17,21 @@
 
     <VCardItem>
       <DataTable
+        ref="datatable"
         :headers="headers"
-        :items="debts"
-      />
+        endpoint="/memberdebtlist/get-all-by-filter"
+        :payload="payload"
+      >
+        <template #DateTime="{ item }">
+          <VChip
+            size="small"
+            label
+            class="text-capitalize"
+          >
+            {{ dateTime(item.item.creationDate) }}
+          </VChip>
+        </template>
+      </DataTable>
     </VCardItem>
 
     <VDialog
@@ -48,19 +60,28 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DataTable from '@/components/datatable/DataTable.vue'
 import MemberDebtListForm from '@/components/settings/member-debt-list/MemberDebtListForm.vue'
+import { DateTime } from "luxon"
 
 const { t } = useI18n()
 const uploadDialog = ref(false)
 const debts = ref([])
+const payload = ref([])
 
 function refreshDebts(newDebts) {
-  debts.value = newDebts
+  payload.value = newDebts
+}
+
+function dateTime(dateTimeMember) {
+  
+  return DateTime.fromISO(dateTimeMember)
+    .setLocale('tr')
+    .toLocaleString(DateTime)
 }
 
 const headers = computed(() => [
   { title: t('Phone'), key: 'phone', sortable: true },
   { title: t('Debt Amount'), key: 'amount', sortable: true },
-  { title: t('Upload Date'), key: 'uploadedAt', sortable: true },
-  { title: t('Uploaded By'), key: 'uploadedBy', sortable: false },
+  { title: t('Upload Date'), key: 'DateTime', sortable: true },
+  { title: t('Uploaded By'), key: 'createdBy', sortable: false },
 ])
 </script>
