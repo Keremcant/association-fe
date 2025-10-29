@@ -265,13 +265,14 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from '@/plugins/axios'
 import AppTextField from '@core/components/app-form-elements/AppTextField.vue'
 import AppTextarea from '@core/components/app-form-elements/AppTextarea.vue'
+import { DateTime } from 'luxon'
 
 const props = defineProps({
-  formData: { type: Object, default: () => ({}) },
-  readonly: { type: Boolean, default: false },
+  uuid: String,
 })
 
 const form = ref({
@@ -291,13 +292,67 @@ const form = ref({
   certificates: [],
 })
 
-watch(
-  () => props.formData,
-  val => {
-    if (val) form.value = { ...form.value, ...val }
-  },
-  { immediate: true },
-)
+const isLoading = ref(false)
+
+
+const fetchCv = async () => {
+  if (!props.uuid) return
+  isLoading.value = true
+  try {
+    const response = await axios.get(`/cvlist/${props.uuid}`)
+    const data = response.data
+
+    form.value.fullName = data.fullName
+    form.value.phone = data.phone
+    form.value.email = data.email
+    form.value.birthDate = data.birthDate
+      ? DateTime.fromISO(data.birthDate).toFormat('dd.MM.yyyy')
+      : ''
+    form.value.gender = data.gender
+    form.value.educationStatus = data.educationStatus
+    form.value.disabilityStatus = data.disabilityStatus
+    form.value.title = data.title
+    form.value.city = data.city
+    form.value.address = data.address
+    form.value.preface = data.preface
+
+    // Education
+    form.value.education = (data.educationDTOS || []).map(edu => ({
+      ...edu,
+      graduationYear: edu.graduationYear
+        ? DateTime.fromISO(edu.graduationYear).toFormat('dd.MM.yyyy')
+        : '',
+    }))
+
+    // Work
+    form.value.work = (data.workExperienceDTOS || []).map(job => ({
+      ...job,
+      startDate: job.startDate
+        ? DateTime.fromISO(job.startDate).toFormat('dd.MM.yyyy')
+        : '',
+      endDate: job.endDate
+        ? DateTime.fromISO(job.endDate).toFormat('dd.MM.yyyy')
+        : '',
+    }))
+
+    // Certificates
+    form.value.certificates = (data.certificateDTOS || []).map(cert => ({
+      ...cert,
+      date: cert.date
+        ? DateTime.fromISO(cert.date).toFormat('dd.MM.yyyy')
+        : '',
+    }))
+  } catch (error) {
+    console.error('Error fetching CV:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+
+onMounted(() => {
+  fetchCv()
+})
 </script>
 
 <style scoped>

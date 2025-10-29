@@ -23,6 +23,7 @@
         ref="datatable"
         :headers="headers"
         endpoint="/tags/get-all-by-filter"
+        excel-endpoint="/tags/export/excel"
         :payload="payload"
       >
         <template #actions="{item}">

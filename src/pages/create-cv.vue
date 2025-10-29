@@ -411,6 +411,7 @@ import authV1TopShape from '@images/svg/auth-v1-top-shape.svg?raw'
 import SnackBar from '@/components/SnackBar.vue'
 import citiesData from '@/layouts/cities.json'
 import { useI18n } from 'vue-i18n'
+import axios from '@/plugins/axios'
 
 definePage({ meta: { layout: 'blank', unauthenticatedOnly: true } })
 
@@ -459,7 +460,25 @@ const removeCertificate = index => form.value.certificates.splice(index, 1)
 const onSubmit = async () => {
   const { valid } = await formRef.value.validate()
   if (!valid) return
-  snackbar.value.show(t('CV created successfully!'), 'success')
+
+  isLoading.value = true
+
+  try {
+    // Backend URL ve payload
+    const response = await axios.post('/cvlist/', form.value)
+
+    if (response.status >= 200 && response.status < 300) {
+      snackbar.value.show(t('CV created successfully!'), 'success')
+      router.push('/') // kayıt sonrası anasayfaya yönlendirme
+    } else {
+      snackbar.value.show(response.data.message || t('Error occurred'), 'error')
+    }
+  } catch (error) {
+    console.error(error)
+    snackbar.value.show(error.response?.data?.message || t('Error occurred'), 'error')
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
