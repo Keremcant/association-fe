@@ -56,15 +56,15 @@
               </VCol>
 
               <!-- Doğrula Butonu -->
-              <VCol cols="12">
-                <VBtn
-                  :loading="isVerifying"
-                  block
-                  type="submit"
-                >
-                  Doğrula
-                </VBtn>
-              </VCol>
+              <VBtn
+                :loading="isVerifying"
+                :disabled="isVerifying"
+                block
+                type="submit"
+              >
+                Doğrula
+              </VBtn>
+
 
               <!-- OTP Yeniden Gönder -->
               <VCol
@@ -127,7 +127,7 @@ const onSubmitOtp = async () => {
   const { valid } = await refOtpForm.value.validate()
   if (!valid) return
 
-  isVerifying.value = true
+  isVerifying.value = true // buton loading + disable olacak
 
   try {
     const res = await axios.post('/auth/verify-otp', {
@@ -136,17 +136,18 @@ const onSubmitOtp = async () => {
     })
 
     if (res.status >= 200 && res.status < 300) {
+      isVerifying.value = false
       handleSuccessfulLogin(res.data)
-    }else{
+    } else {
       snackbar.value.show(res.data || 'Kod hatalı veya süresi dolmuş.', 'error')
     }
   } catch (err) {
     snackbar.value.show(err.response?.data?.message || 'Kod hatalı veya süresi dolmuş.', 'error')
-  }
-  finally {
-    isVerifying.value = false
+  } finally {
+    isVerifying.value = false // işlem bitince buton tekrar aktif olur
   }
 }
+
 
 
 // OTP yeniden gönder
