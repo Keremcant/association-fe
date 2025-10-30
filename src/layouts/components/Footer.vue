@@ -6,11 +6,11 @@
       {{ new Date().getFullYear() }}
       Made
       By <a
-        href="https://pixinvent.com"
+        href="https://www.oxit.com.tr/"
         target="_blank"
         rel="noopener noreferrer"
         class="text-primary ms-1"
-      >Pixinvent</a>
+      >OXIT BİLİŞİM</a>
     </span>
     <!-- 👉 Footer: right content -->
   </div>

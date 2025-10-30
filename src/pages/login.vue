@@ -75,8 +75,9 @@
                   >
                     {{ $t('Register') }}
                   </RouterLink>
+
                   <RouterLink
-                    class="text-primary"
+                    class="text-primary mt-4"
                     :to="{ name: 'forgot-password' }"
                   >
                     {{ $t('Forgot Password') }}

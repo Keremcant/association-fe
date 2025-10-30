@@ -38,361 +38,372 @@
         </VCardText>
 
         <VCardText>
-          <VForm
-            ref="formRef"
-            @submit.prevent="onSubmit"
-          >
-            <VRow>
-              <VCol
-                cols="12"
-                md="6"
+          <template v-if="formSubmitted">
+            <VAlert
+              type="success"
+              variant="tonal"
+              class="text-center mb-4"
+            >
+              {{ $t('Your application has been received!') }}
+            </VAlert>
+            <div class="d-flex justify-center mt-6">
+              <VBtn
+                color="primary"
+                class="px-10"
+                @click="goToLogin"
               >
-                <AppTextField
-                  v-model="form.fullName"
-                  :label="$t('Name Surname')"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
+                {{ $t('Back To Login') }}
+              </VBtn>
+            </div>
+          </template>
+          <template v-else>
+            <VForm
+              ref="formRef"
+              @submit.prevent="onSubmit"
+            >
+              <VRow>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppTextField
+                    v-model="form.fullName"
+                    :label="$t('Name Surname')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppTextField
+                    v-model="form.phone"
+                    :label="$t('Phone (starting with 0)')"
+                    maxlength="11"
+                    :rules="[requiredValidator, phoneValidator]"
+                    @input="form.phone = form.phone.replace(/\D/g, '')"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppTextField
+                    v-model="form.email"
+                    :label="$t('E Mail')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppTextField
+                    v-model="form.birthDate"
+                    :label="$t('Birth Date')"
+                    type="date"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppAutocomplete
+                    v-model="form.gender"
+                    :items="[$t('Male'), $t('Female')]"
+                    :label="$t('Gender')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppAutocomplete
+                    v-model="form.educationStatus"
+                    :items="[$t('Bachelor'), $t('Associate'), $t('Master')]"
+                    :label="$t('Education Status')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppAutocomplete
+                    v-model="form.disabilityStatus"
+                    :items="[$t('No'), $t('Yes')]"
+                    :label="$t('Disability')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppAutocomplete
+                    v-model="form.title"
+                    :items="[$t('Caregiver'), $t('Cleaning Staff'), $t('Chef'), $t('Assistant Chef'), $t('Security Staff'), $t('Driver')]"
+                    :label="$t('Appellation')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppAutocomplete
+                    v-model="form.city"
+                    :items="cities"
+                    :label="$t('City')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="6"
+                >
+                  <AppTextField
+                    v-model="form.address"
+                    :label="$t('Address')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+                <VCol cols="12">
+                  <AppTextarea
+                    v-model="form.preface"
+                    :label="$t('Preface')"
+                    :rules="[requiredValidator]"
+                  />
+                </VCol>
+              </VRow>
+
+              <h4 class="mt-8 mb-2">
+                {{ $t('Education') }}
+              </h4>
+              <div
+                v-for="(edu, index) in form.education"
+                :key="'edu-' + index"
+                class="dynamic-section"
+              >
+                <VRow>
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
+                    <AppTextField
+                      v-model="edu.school"
+                      :label="$t('School Name')"
+                      :rules="[requiredValidator]"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
+                    <AppTextField
+                      v-model="edu.department"
+                      :label="$t('Department Name')"
+                      :rules="[requiredValidator]"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="2"
+                  >
+                    <AppTextField
+                      v-model="edu.graduationYear"
+                      type="date"
+                      :label="$t('Graduation Date')"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="1"
+                    class="d-flex align-center justify-center mt-4"
+                  >
+                    <VBtn
+                      icon="tabler-trash"
+                      color="error"
+                      variant="plain"
+                      class="rounded-circle"
+                      @click="removeEducation(index)"
+                    />
+                  </VCol>
+                </VRow>
+              </div>
+              <VBtn
+                color="primary"
+                variant="tonal"
+                class="add-btn mt-3"
+                @click="addEducation"
+              >
+                {{ $t('Add Education') }}
+              </VBtn>
+
+              <h4 class="mt-8 mb-2">
+                {{ $t('Work Experience') }}
+              </h4>
+              <div
+                v-for="(job, index) in form.work"
+                :key="'work-' + index"
+                class="dynamic-section"
+              >
+                <VRow>
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
+                    <AppTextField
+                      v-model="job.company"
+                      :label="$t('Company Name')"
+                      :rules="[requiredValidator]"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="3"
+                  >
+                    <AppTextField
+                      v-model="job.position"
+                      :label="$t('Position')"
+                      :rules="[requiredValidator]"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="2"
+                  >
+                    <AppTextField
+                      v-model="job.startDate"
+                      type="date"
+                      :label="$t('Start Date')"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="2"
+                  >
+                    <AppTextField
+                      v-model="job.endDate"
+                      type="date"
+                      :label="$t('End Date')"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="1"
+                    class="d-flex align-center justify-center mt-4"
+                  >
+                    <VBtn
+                      icon="tabler-trash"
+                      color="error"
+                      variant="plain"
+                      @click="removeWork(index)"
+                    />
+                  </VCol>
+                </VRow>
+              </div>
+              <VBtn
+                color="primary"
+                variant="tonal"
+                class="add-btn mt-3"
+                @click="addWork"
+              >
+                {{ $t('Add Work') }}
+              </VBtn>
+
+              <h4 class="mt-8 mb-2">
+                {{ $t('Certificates') }}
+              </h4>
+              <div
+                v-for="(cert, index) in form.certificates"
+                :key="'cert-' + index"
+                class="dynamic-section"
+              >
+                <VRow>
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
+                    <AppTextField
+                      v-model="cert.title"
+                      :label="$t('Certificate Title')"
+                      :rules="[requiredValidator]"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="4"
+                  >
+                    <AppTextField
+                      v-model="cert.institution"
+                      :label="$t('Institution')"
+                      :rules="[requiredValidator]"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="2"
+                  >
+                    <AppTextField
+                      v-model="cert.date"
+                      type="date"
+                      :label="$t('Date')"
+                    />
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="1"
+                    class="d-flex align-center justify-center mt-4"
+                  >
+                    <VBtn
+                      icon="tabler-trash"
+                      color="error"
+                      variant="plain"
+                      @click="removeCertificate(index)"
+                    />
+                  </VCol>
+                </VRow>
+              </div>
+              <VBtn
+                color="primary"
+                variant="tonal"
+                class="add-btn mt-3"
+                @click="addCertificate"
+              >
+                {{ $t('Add Certificate') }}
+              </VBtn>
 
               <VCol
                 cols="12"
-                md="6"
+                class="d-flex justify-center mt-6"
               >
-                <AppTextField
-                  v-model="form.phone"
-                  :label="$t('Phone (starting with 0)')"
-                  maxlength="11"
-                  :rules="[requiredValidator, phoneValidator]"
-                  @input="form.phone = form.phone.replace(/\D/g, '')"
-                />
-              </VCol>
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppTextField
-                  v-model="form.email"
-                  :label="$t('E Mail')"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppTextField
-                  v-model="form.birthDate"
-                  :label="$t('Birth Date')"
-                  type="date"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppAutocomplete
-                  v-model="form.gender"
-                  :items="[$t('Male'), $t('Female')]"
-                  :label="$t('Gender')"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppAutocomplete
-                  v-model="form.educationStatus"
-                  :items="[$t('Bachelor'), $t('Associate'), $t('Master')]"
-                  :label="$t('Education Status')"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppAutocomplete
-                  v-model="form.disabilityStatus"
-                  :items="[$t('None'), $t('Yes')]"
-                  :label="$t('Disability')"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppAutocomplete
-                  v-model="form.title"
-                  :items="[$t('Caregiver'), $t('Cleaning Staff'), $t('Chef'), $t('Assistant Chef'), $t('Security Staff'), $t('Driver')]"
-                  :label="$t('Appellation')"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-
-
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppAutocomplete
-                  v-model="form.city"
-                  :items="cities"
-                  :label="$t('City')"
-                  :rules="[requiredValidator]"
-                />
-              </VCol>
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <AppTextField
-                  v-model="form.address"
-                  :label="$t('Address')"
-                  :rules="[requiredValidator]"
-                />
+                <VBtn
+                  type="submit"
+                  :loading="isLoading"
+                  class="px-10"
+                >
+                  {{ $t('Save') }}
+                </VBtn>
               </VCol>
 
               <VCol cols="12">
-                <AppTextarea
-                  v-model="form.preface"
-                  :label="$t('Preface')"
-                  :rules="[requiredValidator]"
-                />
+                <RouterLink
+                  class="d-flex align-center justify-center mt-2"
+                  :to="{ name: 'login' }"
+                >
+                  <VIcon
+                    icon="tabler-chevron-left"
+                    size="20"
+                    class="me-1 flip-in-rtl"
+                  />
+                  <span>{{ $t('Back To Login') }}</span>
+                </RouterLink>
               </VCol>
-            </VRow>
-
-            <h4 class="mt-8 mb-2">
-              {{ $t('Education') }}
-            </h4>
-            <div
-              v-for="(edu, index) in form.education"
-              :key="'edu-' + index"
-              class="dynamic-section"
-            >
-              <VRow>
-                <VCol
-                  cols="12"
-                  md="4"
-                >
-                  <AppTextField
-                    v-model="edu.school"
-                    :label="$t('School Name')"
-                    :rules="[requiredValidator]"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="4"
-                >
-                  <AppTextField
-                    v-model="edu.department"
-                    :label="$t('Department Name')"
-                    :rules="[requiredValidator]"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="2"
-                >
-                  <AppTextField
-                    v-model="edu.graduationYear"
-                    type="date"
-                    :label="$t('Graduation Date')"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="1"
-                  class="d-flex align-center justify-center mt-4"
-                >
-                  <VBtn
-                    icon="tabler-trash"
-                    color="error"
-                    variant="plain"
-                    class="rounded-circle"
-                    @click="removeEducation(index)"
-                  />
-                </VCol>
-              </VRow>
-            </div>
-            <VBtn
-              color="primary"
-              variant="tonal"
-              class="add-btn mt-3"
-              @click="addEducation"
-            >
-              {{ $t('Add Education') }}
-            </VBtn>
-
-            <h4 class="mt-8 mb-2">
-              {{ $t('Work Experience') }}
-            </h4>
-            <div
-              v-for="(job, index) in form.work"
-              :key="'work-' + index"
-              class="dynamic-section"
-            >
-              <VRow>
-                <VCol
-                  cols="12"
-                  md="3"
-                >
-                  <AppTextField
-                    v-model="job.company"
-                    :label="$t('Company Name')"
-                    :rules="[requiredValidator]"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="3"
-                >
-                  <AppTextField
-                    v-model="job.position"
-                    :label="$t('Position')"
-                    :rules="[requiredValidator]"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="2"
-                >
-                  <AppTextField
-                    v-model="job.startDate"
-                    type="date"
-                    :label="$t('Start Date')"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="2"
-                >
-                  <AppTextField
-                    v-model="job.endDate"
-                    type="date"
-                    :label="$t('End Date')"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="1"
-                  class="d-flex align-center justify-center mt-4"
-                >
-                  <VBtn
-                    icon="tabler-trash"
-                    color="error"
-                    variant="plain"
-                    @click="removeWork(index)"
-                  />
-                </VCol>
-              </VRow>
-            </div>
-            <VBtn
-              color="primary"
-              variant="tonal"
-              class="add-btn mt-3"
-              @click="addWork"
-            >
-              {{ $t('Add Work') }}
-            </VBtn>
-
-            <h4 class="mt-8 mb-2">
-              {{ $t('Certificates') }}
-            </h4>
-            <div
-              v-for="(cert, index) in form.certificates"
-              :key="'cert-' + index"
-              class="dynamic-section"
-            >
-              <VRow>
-                <VCol
-                  cols="12"
-                  md="4"
-                >
-                  <AppTextField
-                    v-model="cert.title"
-                    :label="$t('Certificate Title')"
-                    :rules="[requiredValidator]"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="4"
-                >
-                  <AppTextField
-                    v-model="cert.institution"
-                    :label="$t('Institution')"
-                    :rules="[requiredValidator]"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="2"
-                >
-                  <AppTextField
-                    v-model="cert.date"
-                    type="date"
-                    :label="$t('Date')"
-                  />
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="1"
-                  class="d-flex align-center justify-center mt-4"
-                >
-                  <VBtn
-                    icon="tabler-trash"
-                    color="error"
-                    variant="plain"
-                    @click="removeCertificate(index)"
-                  />
-                </VCol>
-              </VRow>
-            </div>
-            <VBtn
-              color="primary"
-              variant="tonal"
-              class="add-btn mt-3"
-              @click="addCertificate"
-            >
-              {{ $t('Add Certificate') }}
-            </VBtn>
-
-            <VCol
-              cols="12"
-              class="d-flex justify-center mt-6"
-            >
-              <VBtn
-                type="submit"
-                :loading="isLoading"
-                class="px-10"
-              >
-                {{ $t('Save') }}
-              </VBtn>
-            </VCol>
-
-            <VCol cols="12">
-              <RouterLink
-                class="d-flex align-center justify-center mt-2"
-                :to="{ name: 'login' }"
-              >
-                <VIcon
-                  icon="tabler-chevron-left"
-                  size="20"
-                  class="me-1 flip-in-rtl"
-                />
-                <span>{{ $t('Back To Login') }}</span>
-              </RouterLink>
-            </VCol>
-          </VForm>
+            </VForm>
+          </template>
         </VCardText>
       </VCard>
     </div>
@@ -420,6 +431,7 @@ const router = useRouter()
 const snackbar = ref()
 const formRef = ref()
 const isLoading = ref(false)
+const formSubmitted = ref(false)
 const cities = ref(citiesData)
 
 const form = ref({
@@ -450,26 +462,20 @@ const phoneValidator = val => {
 
 const addEducation = () => form.value.education.push({ school: '', department: '', graduationYear: '' })
 const removeEducation = index => form.value.education.splice(index, 1)
-
 const addWork = () => form.value.work.push({ company: '', position: '', startDate: '', endDate: '' })
 const removeWork = index => form.value.work.splice(index, 1)
-
 const addCertificate = () => form.value.certificates.push({ title: '', institution: '', date: '' })
 const removeCertificate = index => form.value.certificates.splice(index, 1)
 
 const onSubmit = async () => {
   const { valid } = await formRef.value.validate()
   if (!valid) return
-
   isLoading.value = true
-
   try {
-    // Backend URL ve payload
     const response = await axios.post('/cvlist/', form.value)
-
     if (response.status >= 200 && response.status < 300) {
+      formSubmitted.value = true
       snackbar.value.show(t('CV created successfully!'), 'success')
-      router.push('/') // kayıt sonrası anasayfaya yönlendirme
     } else {
       snackbar.value.show(response.data.message || t('Error occurred'), 'error')
     }
@@ -479,6 +485,10 @@ const onSubmit = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const goToLogin = () => {
+  router.push({ name: 'login' })
 }
 </script>
 

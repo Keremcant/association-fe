@@ -62,7 +62,19 @@ const datatable = ref()
 
 
 async function refresh() {
+  isLoading.value = true
   await datatable.value.refresh()
+  isLoading.value = false
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  
+  return `${day}.${month}.${year}` // veya `${day} ${month} ${year}`
 }
 
 function showCv(item) {
@@ -74,7 +86,11 @@ function showCv(item) {
 const headers = computed(() => [
   { title: t('Title'), key: 'title' },
   { title: t('Tags'), key: 'tagsAsString' },
-  { title: t('Decision Date'), key: 'decisionDate', value: item => item.decisionDate ? item.decisionDate.split('T')[0] : '' },
+  {
+    title: t('Decision Date'),
+    key: 'decisionDate',
+    value: item => formatDate(item.decisionDate),
+  },
   { title: t('Actions'), key: 'actions', sortable: false },
 ])
 </script>
