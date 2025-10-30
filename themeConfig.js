@@ -9,7 +9,7 @@ import { AppContentLayoutNav, ContentWidth, FooterType, NavbarType } from '@layo
 
 export const { themeConfig, layoutConfig } = defineThemeConfig({
   app: {
-    title: 'Özel Engelli Bakım Merkezleri Derneği',
+    title: 'ÖZBAKDER',
     logo: h('img', {
       src: logo,
       alt: 'Logo',

@@ -23,17 +23,23 @@
           <VCardTitle>
             <RouterLink to="/">
               <div class="app-logo">
-                <VNodeRenderer :nodes="themeConfig.app.logo" />
-                <h1 class="app-logo-title">
+                <img
+                  style="height: 200px;"
+                  src="../../public/icon.png"
+                >
+
+                <!--
+                  <h1 class="app-logo-title">
                   {{ themeConfig.app.title }}
-                </h1>
+                  </h1>
+                -->
               </div>
             </RouterLink>
           </VCardTitle>
         </VCardItem>
 
         <VCardText>
-          <h4 class="text-h4 mb-1">
+          <h4 class="text-h4 mb-1 mt-6">
             {{ $t('Forgot Password') }}
           </h4>
           <p class="mb-0">

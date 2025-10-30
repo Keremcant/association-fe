@@ -19,10 +19,10 @@
           <VCardTitle>
             <RouterLink to="/">
               <div class="app-logo">
-                <VNodeRenderer :nodes="themeConfig.app.logo" />
-                <h1 class="app-logo-title">
-                  {{ themeConfig.app.title }}
-                </h1>
+                <img
+                  style="height: 175px;"
+                  src="../../public/icon.png"
+                >
               </div>
             </RouterLink>
           </VCardTitle>
