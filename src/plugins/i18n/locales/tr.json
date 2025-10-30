@@ -277,5 +277,10 @@
   "Number of Institutions": "Kurum Sayısı",
   "File (PDF only)": "Dosya (Sadece PDF)",
   "PDF yüklenemedi": "PDF dosyası yüklenemedi.",
-  "User Dashboard": "Kullanıcı Ana Sayfa*"
+  "User Dashboard": "Kullanıcı Ana Sayfa*",
+  "Excel uploaded successfully": "Excel Başarıyla Yüklendi",
+  "CV created successfully!": "CV başarıyla oluşturuldu!",
+  "Your application has been received!": "Başvurunuz alınmıştır!",
+  "Please sign in to your account": "Lütfen hesabınıza giriş yapın",
+  "OTP mailinize gönderildi.": "OTP mailinize gönderildi."
 }

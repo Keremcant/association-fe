@@ -1,1 +1,20 @@
-// Write your overrides
+.layout-wrapper.layout-nav-type-horizontal .layout-navbar {
+  z-index: 11;
+  block-size: 80px;
+}
+.v-theme--light {
+  --v-theme-primary: 4,148,193 !important;
+  --v-global-theme-primary: 4,148,193 !important;
+}
+
+
+.v-theme--dark {
+  --v-theme-primary: 4,148,193 !important;
+  --v-global-theme-primary: 4,148,193 !important;
+}
+
+.vue-devtools__anchor[data-v-a5b0a558]
+{
+
+  display: none;
+}

@@ -415,5 +415,10 @@
   "Number of Institutions": "Number of Institutions",
   "File (PDF only)": "File (PDF only)",
   "PDF yüklenemedi": "The PDF could not be loaded.",
-  "User Dashboard": "User Dashboard"
+  "User Dashboard": "User Dashboard",
+  "Excel uploaded successfully": "Excel uploaded successfully",
+  "CV created successfully!": "CV created successfully!",
+  "Your application has been received!": "Your application has been received!",
+  "Please sign in to your account": "Please sign in to your account",
+  "OTP mailinize gönderildi.": "The OTP has been sent to your email."
 }
