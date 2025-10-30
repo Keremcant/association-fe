@@ -17,10 +17,19 @@
         :class="$vuetify.display.smAndUp ? 'pa-6' : 'pa-0'"
       >
         <VCardText>
-          <h4 class="text-h4 mb-1 text-center">
-            Association Admin Panel
-          </h4>
-          <p class="mb-0 text-center">
+          <div class="app-logo">
+            <img
+              style="height: 200px;"
+              src="../../public/icon.png"
+            >
+
+            <!--
+              <h1 class="app-logo-title">
+              {{ themeConfig.app.title }}
+              </h1>
+            -->
+          </div>
+          <p class="mb-0 text-center mt-10">
             {{ $t('Please sign in to your account') }}
           </p>
         </VCardText>

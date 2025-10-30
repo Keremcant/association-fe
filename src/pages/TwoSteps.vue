@@ -21,7 +21,7 @@
       >
         <VCardText>
           <h4 class="text-h4 mb-1 text-center">
-            Two Step Verification 💬
+            İki Adımlı Doğrulama
           </h4>
           <p class="mb-1 text-center">
             E-posta adresinize gönderilen OTP kodunu giriniz.
