@@ -420,5 +420,6 @@
   "CV created successfully!": "CV created successfully!",
   "Your application has been received!": "Your application has been received!",
   "Please sign in to your account": "Please sign in to your account",
-  "OTP mailinize gönderildi.": "The OTP has been sent to your email."
+  "OTP mailinize gönderildi.": "The OTP has been sent to your email.",
+  "Kullanıcı durumu değiştirildi": "User status changed"
 }
