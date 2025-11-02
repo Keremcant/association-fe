@@ -12,7 +12,7 @@
         :payload="payload"
       >
         <template #actions="{item}">
-          <IconBtn @click="selectAuthorizedPageVisible=true; selectedRoleId = item.item.id; selectedRole = item.item.name">
+          <IconBtn @click="selectAuthorizedPageVisible=true; selectedRoleId = item.item.uuid; selectedRole = item.item.name">
             <VIcon icon="tabler-user-scan" />
             <VTooltip
               activator="parent"
@@ -21,7 +21,7 @@
               {{ $t('Authorized Pages') }}
             </VTooltip>
           </IconBtn>
-          <IconBtn @click="authorizations(item.item.id, item.item.name)">
+          <IconBtn @click="authorizations(item.item.uuid, item.item.name)">
             <VIcon icon="tabler-shield-lock" />
             <VTooltip
               activator="parent"
@@ -30,7 +30,7 @@
               {{ $t('Go Authorizations') }}
             </VTooltip>
           </IconBtn>
-          <IconBtn @click="() => {selectedRoleId = item.item.id; updateDialog = true;}">
+          <IconBtn @click="() => {selectedRoleId = item.item.uuid; updateDialog = true;}">
             <VIcon icon="tabler-edit" />
             <VTooltip
               activator="parent"
@@ -39,7 +39,7 @@
               {{ $t('Edit role') }}
             </VTooltip>
           </IconBtn>
-          <IconBtn @click="deleteRole(item.item.id, item.item.name)">
+          <IconBtn @click="deleteRole(item.item.uuid, item.item.name)">
             <VIcon icon="tabler-trash" />
             <VTooltip
               activator="parent"
@@ -87,8 +87,8 @@
           <VRow>
             <VCol cols="12">
               <SelectAuthorizedPage
-                :id="selectedRoleId"
                 v-model:is-dialog-visible="selectAuthorizedPageVisible"
+                :uuid="selectedRoleId"
                 :role-name="selectedRole"
               />
             </VCol>

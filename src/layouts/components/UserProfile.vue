@@ -5,6 +5,8 @@ import { useCookie } from '@/@core/composable/useCookie'
 // eslint-disable-next-line import/extensions
 import { useAbility } from "@/plugins/casl/composables/useAbility.js"
 
+definePage({ meta: { layout: 'blank', unauthenticatedOnly: false } })
+
 const router = useRouter()
 const ability = useAbility()
 const { t } = useI18n()
@@ -48,6 +50,13 @@ const userProfileList = [
     type: 'navItem',
     icon: 'tabler-user',
     title: t('Profile'),
+    to: '/profile',
+  },
+  {
+    type: 'navItem',
+    icon: 'tabler-settings',
+    title: t('Company'),
+    to: '/company',
   },
 ]
 </script>
@@ -159,3 +168,7 @@ const userProfileList = [
     </VAvatar>
   </VBadge>
 </template>
+
+<style lang="scss">
+@use "@core/scss/template/pages/page-auth";
+</style>

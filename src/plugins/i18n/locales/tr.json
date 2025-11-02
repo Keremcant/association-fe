@@ -192,7 +192,6 @@
   "Certificate Title": "Sertifika Başlığı",
   "Institution": "Kurum Adı",
   "Date": "Tarih",
-  "Company Name": "Şirket Adı",
   "Please fill out the form below to create your CV.": "CV oluşturmak için lütfen aşağıdaki formu doldurun.",
   "Phone (starting with 0)": "Telefon (0 ile başlayın)",
   "Preface": "Ön Yazı",
@@ -282,5 +281,13 @@
   "CV created successfully!": "CV başarıyla oluşturuldu!",
   "Your application has been received!": "Başvurunuz alınmıştır!",
   "Please sign in to your account": "Lütfen hesabınıza giriş yapın",
-  "OTP mailinize gönderildi.": "OTP mailinize gönderildi."
+  "OTP mailinize gönderildi.": "OTP mailinize gönderildi.",
+  "Kullanıcı durumu değiştirildi": "Kullanıcı durumu değiştirildi",
+  "Company": "Kurum",
+  "User Information": "Kullanıcı Bilgileri",
+  "Suspend": "Askıya al",
+  "Edit": "Düzenle",
+  "Company Details": "Kurum Detayları",
+  "Update": "Güncelle",
+  "Edit Company": "Kurumu Düzenle"
 }
