@@ -1,101 +1,3 @@
-<script setup>
-import { ref, watch } from 'vue'
-import axios from '@/plugins/axios.js'
-import { useI18n } from 'vue-i18n'
-import AppTextField from '@core/components/app-form-elements/AppTextField.vue'
-import AppSelect from '@core/components/app-form-elements/AppSelect.vue'
-import CompanyEditDialog from "@/components/company/CompanyEditDialog.vue"
-
-const { t } = useI18n()
-
-
-// 🔹 Kullanıcı verileri
-const users = ref([
-  {
-    id: 1,
-    companyName: 'Özel Kış Gülü Özgür Evler Bakım Merkezi',
-    companyPhone: '05551234567',
-    companyEmail: 'info@ozguryazilim.com',
-    region: 'Akdeniz',
-    city: 'Mersin',
-    workAddress: 'Çankaya Mah. Teknokent Cad. No:12',
-  },
-  {
-    id: 2,
-    companyName: 'Demir Ticaret A.Ş.',
-    companyPhone: '905559876543',
-    companyEmail: 'iletisim@demirticaret.com',
-    region: 'Marmara',
-    city: 'İstanbul',
-    workAddress: 'Maslak Mh. Büyükdere Cd. No:45',
-  },
-  {
-    id: 3,
-    companyName: 'Kaya Bilişim Hizmetleri',
-    companyPhone: '905553332211',
-    companyEmail: 'destek@kayabilisim.com',
-    region: 'Ege',
-    city: 'İzmir',
-    workAddress: 'Bornova Mh. Sanayi Cd. No:8',
-  },
-])
-
-// 🔹 Dialog kontrolü
-const isUserInfoEditDialogVisible = ref(false)
-const selectedUser = ref(null)
-
-// 🔹 localUser için güvenli başlangıç ve watch
-const localUser = ref({
-  companyName: '',
-  companyPhone: '',
-  companyEmail: '',
-  region: '',
-  city: '',
-  workAddress: '',
-})
-
-watch(
-  () => selectedUser.value,
-  newVal => {
-    if (newVal && typeof newVal === 'object') {
-      localUser.value = JSON.parse(JSON.stringify(newVal)) // <-- structuredClone yerine
-    } else {
-      localUser.value = {
-        companyName: '',
-        companyPhone: '',
-        companyEmail: '',
-        region: '',
-        city: '',
-        workAddress: '',
-      }
-    }
-  },
-  { immediate: true },
-)
-
-
-
-// 🔹 Edit dialog açma
-const openEditDialog = user => {
-  selectedUser.value = user
-  isUserInfoEditDialogVisible.value = true
-}
-
-// 🔹 Güncellenen veriyi kaydetme
-const updateUser = async updatedUser => {
-  try {
-    // Backend update isteği
-    await axios.post('/api/company/update', updatedUser)
-
-    // Local listeyi güncelle
-    const index = users.value.findIndex(u => u.id === updatedUser.id)
-    if (index !== -1) users.value[index] = { ...updatedUser }
-  } catch (error) {
-    console.error('Update failed:', error)
-  }
-}
-</script>
-
 <template>
   <VRow>
     <VCol
@@ -121,27 +23,27 @@ const updateUser = async updatedUser => {
           <VList class="card-list mt-2">
             <VListItem>
               <VListItemTitle>
-                {{ t('Company Name') }}: {{ user.companyName }}
+                {{ t('Company Name') }}: {{ user.institutionName }}
               </VListItemTitle>
             </VListItem>
             <VListItem>
               <VListItemTitle>
-                {{ t('Company Phone') }}: {{ user.companyPhone }}
+                {{ t('Company Phone') }}: {{ user.institutionPhone }}
               </VListItemTitle>
             </VListItem>
             <VListItem>
               <VListItemTitle>
-                {{ t('Company Email') }}: {{ user.companyEmail }}
+                {{ t('Company Email') }}: {{ user.institutionMail }}
               </VListItemTitle>
             </VListItem>
             <VListItem>
               <VListItemTitle>
-                {{ t('Region') }}: {{ user.region }}
+                {{ t('Region') }}: {{ user.institutionRegion }}
               </VListItemTitle>
             </VListItem>
             <VListItem>
               <VListItemTitle>
-                {{ t('City') }}: {{ user.city }}
+                {{ t('City') }}: {{ user.institutionProvince }}
               </VListItemTitle>
             </VListItem>
           </VList>
@@ -159,14 +61,76 @@ const updateUser = async updatedUser => {
       </VCard>
     </VCol>
   </VRow>
-
-  <!-- 🔹 Edit Dialog -->
-  <CompanyEditDialog
-    v-model:is-user-info-edit-dialog-visible="isUserInfoEditDialogVisible"
-    :selected-user="selectedUser"
-    @update-user="updateUser"
-  />
+  <VDialog
+    v-model="uploadDialog"
+    scrollable
+    max-width="600px"
+    transition="dialog-transition"
+  >
+    <VCard>
+      <VCardText>
+        <CompanyEditDialog
+          v-model:is-user-info-edit-dialog-visible="uploadDialog"
+          :selected-institution="selectedInstitutionUUID"
+          @update-user="handleUpdateUser"
+        />
+      </VCardText>
+    </VCard>
+  </VDialog>
 </template>
+
+<script setup>
+import { onMounted, ref } from 'vue'
+import axios from '@/plugins/axios.js'
+import { useI18n } from 'vue-i18n'
+import CompanyEditDialog from "@/components/company/CompanyEditDialog.vue"
+import { useCookie } from "@core/composable/useCookie.js"
+
+const { t } = useI18n()
+
+const userData = useCookie('associationData')
+const loggedInUser = ref(userData.value.id ? userData.value.id : null)
+const userUUID = ref(null)
+const isLoading = ref(false)
+const users = ref([])
+const uploadDialog = ref(false)
+const selectedInstitutionUUID = ref(null)
+
+// Kullanıcı verisini çek
+const getUserData = async () => {
+  try {
+    if (!loggedInUser.value) return
+
+    isLoading.value = true
+    userUUID.value = loggedInUser.value
+
+    const response = await axios.get(`/user-api/${userUUID.value}`)
+    const user = response.data || {}
+
+    users.value = user.institutions
+  } catch (error) {
+    console.error('Kullanıcı verisi alınamadı:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Edit butonuna basınca diyalog aç
+const openEditDialog = user => {
+  selectedInstitutionUUID.value = user.uuid
+  uploadDialog.value = true
+}
+
+// Emit geldiğinde tetiklenecek fonksiyon
+const handleUpdateUser = async () => {
+  uploadDialog.value = false // diyalogu kapat
+  await getUserData() // listeyi yenile
+}
+
+onMounted(() => {
+  getUserData()
+})
+</script>
 
 <style scoped>
 .card-list {

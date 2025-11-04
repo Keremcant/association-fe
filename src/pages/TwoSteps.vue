@@ -136,15 +136,15 @@ const onSubmitOtp = async () => {
     })
 
     if (res.status >= 200 && res.status < 300) {
-      isVerifying.value = false
-      handleSuccessfulLogin(res.data)
+      // 🔹 Burada butonu açmıyoruz artık!
+      await handleSuccessfulLogin(res.data)
     } else {
       snackbar.value.show(res.data || 'Kod hatalı veya süresi dolmuş.', 'error')
+      isVerifying.value = false // sadece hata durumunda aç
     }
   } catch (err) {
     snackbar.value.show(err.response?.data?.message || 'Kod hatalı veya süresi dolmuş.', 'error')
-  } finally {
-    isVerifying.value = false // işlem bitince buton tekrar aktif olur
+    isVerifying.value = false // sadece hata durumunda aç
   }
 }
 

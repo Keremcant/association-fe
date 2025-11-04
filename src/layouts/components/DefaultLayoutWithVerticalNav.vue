@@ -9,7 +9,53 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
 import NavBarI18n from '@core/components/I18n.vue'
 
 const menu = ref([])
+const institutions = ref([])
+const institution = ref()
 const associationData = useCookie('associationData')
+
+onBeforeMount(async () => {
+  try {
+    const response = await axios.get(`/institution/${associationData.value.id}/institutions`)
+    if (response.status >= 200 && response.status < 300) {
+      const validInstitutions = response.data.institutions.filter(inst => inst.uuid)
+
+      institutions.value = validInstitutions.map(inst => ({
+        label: inst.institutionName,
+        value: inst.uuid,
+      }))
+
+      const activeInstitution = validInstitutions.find(i => i.active === true || i.active === "true" || i.active === 1)
+      if (activeInstitution) institution.value = activeInstitution.uuid
+    }
+  } catch (error) {
+    console.error("Error fetching institutions:", error)
+  }
+})
+
+
+let initialized = false
+
+watch(institution, async (newVal, oldVal) => {
+  if (!initialized) {
+    initialized = true
+
+    return // ilk render’da tetiklemeyi atla
+  }
+
+  if (newVal && newVal !== oldVal) {
+    try {
+      const response = await axios.put(`/institution/active-institution/${newVal}/${associationData.value.id}`)
+      if (response.status >= 200 && response.status < 300) {
+        window.location.reload()
+      } else {
+        console.error("Aktif kurum güncellenemedi")
+      }
+    } catch (error) {
+      console.error("Backend güncelleme hatası:", error)
+    }
+  }
+})
+
 
 onBeforeMount(async () => {
   try {
@@ -46,6 +92,7 @@ onBeforeMount(async () => {
 import { HorizontalNavLayout, VerticalNavLayout } from '@layouts'
 import { useCookie } from "@core/composable/useCookie.js"
 import axios from "@/plugins/axios.js"
+import AppSelect from "@core/components/app-form-elements/AppSelect.vue"
 </script>
 
 <template>
@@ -67,6 +114,17 @@ import axios from "@/plugins/axios.js"
         <NavbarThemeSwitcher />
 
         <VSpacer />
+
+        <div class="flex-grow-1 d-flex justify-center">
+          <div style="max-width: 300px; width: 100%;">
+            <AppSelect
+              v-model="institution"
+              :items="institutions"
+              item-title="label"
+              item-value="value"
+            />
+          </div>
+        </div>
 
         <NavBarI18n
           v-if="themeConfig.app.i18n.enable && themeConfig.app.i18n.langConfig?.length"
