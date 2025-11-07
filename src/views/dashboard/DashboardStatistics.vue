@@ -42,36 +42,46 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 
+// 🔹 Dashboard verisini props'tan alıyoruz
+const props = defineProps({
+  data: {
+    type: Object,
+    required: false,
+    default: () => ({}),
+  },
+})
+
 const { t } = useI18n()
 
-const statistics = [
+// 🔹 Veriyi dinamik olarak props üzerinden oluşturuyoruz
+const statistics = computed(() => [
   {
-    key: 'sales',
+    key: 'institutions',
     titleKey: 'Total Number of Institutions',
-    stats: '210',
-    icon: 'tabler-chart-pie-2',
+    stats: props.data?.totalInstitutionCount ?? 0,
+    icon: 'tabler-building',
     color: 'primary',
   },
   {
-    key: 'customers',
+    key: 'meetings',
     titleKey: 'Total Number of Views',
-    stats: '451',
+    stats: props.data?.totalMeetingCount ?? 0,
     icon: 'tabler-users',
     color: 'info',
   },
   {
-    key: 'products',
+    key: 'jobPostings',
     titleKey: 'Total Job Postings',
-    stats: '47',
-    icon: 'tabler-shopping-cart',
+    stats: props.data?.totalJobPostingCount ?? 0,
+    icon: 'tabler-briefcase',
     color: 'error',
   },
   {
-    key: 'revenue',
+    key: 'cvs',
     titleKey: 'Total Number of Resumes',
-    stats: '12',
-    icon: 'tabler-currency-dollar',
+    stats: props.data?.totalCVCount ?? 0,
+    icon: 'tabler-file-text',
     color: 'success',
   },
-]
+])
 </script>

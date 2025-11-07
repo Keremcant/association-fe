@@ -1,21 +1,24 @@
 <template>
   <VRow class="match-height">
-    <!-- 👉 Congratulation John -->
+    <!-- 👉 Congratulations -->
     <VCol
       cols="12"
       md="5"
       lg="4"
     >
-      <DashboardCongratulations />
+      <DashboardCongratulations :data="dashboardData" />
     </VCol>
 
-    <!-- 👉 Ecommerce Transition -->
+    <!-- 👉 Statistics -->
     <VCol
       cols="12"
       md="7"
       lg="8"
     >
-      <DashboardStatistics class="h-100" />
+      <DashboardStatistics
+        class="h-100"
+        :data="dashboardData"
+      />
     </VCol>
 
     <VCol
@@ -23,96 +26,81 @@
       lg="4"
     >
       <VRow>
-        <!-- 👉 Total Profit Line -->
         <VCol
           cols="12"
           lg="6"
           md="3"
           sm="6"
         >
-          <EcommerceTotalProfitLineCharts />
+          <EcommerceTotalProfitLineCharts :data="dashboardData" />
         </VCol>
 
-        <!-- 👉 Expenses Radial Bar Charts -->
         <VCol
           cols="12"
           lg="6"
           md="3"
           sm="6"
         >
-          <EcommerceExpensesRadialBarCharts />
+          <EcommerceExpensesRadialBarCharts :data="dashboardData" />
         </VCol>
 
-        <!-- 👉 Generated Leads -->
         <VCol
           cols="12"
           md="6"
           lg="12"
         >
-          <EcommerceGeneratedLeads />
+          <EcommerceGeneratedLeads :data="dashboardData" />
         </VCol>
       </VRow>
     </VCol>
 
-    <!-- 👉 Revenue Report -->
     <VCol
       cols="12"
       lg="8"
     >
-      <EcommerceRevenueReport />
+      <EcommerceRevenueReport :data="dashboardData" />
     </VCol>
 
-    <!-- 👉 Earning Reports -->
     <VCol
       cols="12"
       sm="6"
       lg="4"
     >
-      <EcommerceEarningReports />
+      <EcommerceEarningReports :data="dashboardData" />
     </VCol>
 
-    <!-- 👉 Popular Products -->
     <VCol
       cols="12"
       sm="6"
       lg="4"
     >
-      <EcommercePopularProducts />
+      <EcommercePopularProducts :data="dashboardData" />
     </VCol>
 
-    <!-- 👉 Order -->
     <VCol
       cols="12"
       sm="6"
       lg="4"
     >
-      <EcommerceOrder />
+      <EcommerceOrder :data="dashboardData" />
     </VCol>
 
-    <!-- 👉 Transaction -->
     <VCol
       cols="12"
       sm="6"
       lg="4"
     >
-      <EcommerceTransactions />
+      <EcommerceTransactions :data="dashboardData" />
     </VCol>
-
-    <!-- 👉 Invoice Table -->
-    <!--
-      <VCol
-      cols="12"
-      lg="8"
-      >
-      <EcommerceInvoiceTable />
-      </VCol>
-    -->
   </VRow>
 </template>
 
 <script setup>
+import { ref, onBeforeMount } from 'vue'
 import { useI18n } from 'vue-i18n'
+import axios from '@/plugins/axios.js'
 
+// Import Components
 import DashboardCongratulations from '@/views/dashboard/DashboardCongratulations.vue'
 import DashboardStatistics from '@/views/dashboard/DashboardStatistics.vue'
 import EcommerceEarningReports from '@/views/dashboard/ecommerce/EcommerceEarningReports.vue'
@@ -123,11 +111,25 @@ import EcommercePopularProducts from '@/views/dashboard/ecommerce/EcommercePopul
 import EcommerceRevenueReport from '@/views/dashboard/ecommerce/EcommerceRevenueReport.vue'
 import EcommerceTotalProfitLineCharts from '@/views/dashboard/ecommerce/EcommerceTotalProfitLineCharts.vue'
 import EcommerceTransactions from '@/views/dashboard/ecommerce/EcommerceTransactions.vue'
-import Dashboard from "@/pages/dashboard/dashboard.vue"
-
-//import EcommerceInvoiceTable from '@/views/dashboard/ecommerce/EcommerceInvoiceTable.vue'
 
 const { t } = useI18n()
+
+const dashboardData = ref(null)
+const snackbar = ref({ show: (msg, type) => console.log(msg, type) }) // örnek snackbar
+
+onBeforeMount(async () => {
+  try {
+    const response = await axios.get('/dashboard/get-admin-dashboard')
+    if (response.status >= 200 && response.status < 300) {
+      dashboardData.value = response.data
+    } else {
+      snackbar.value.show(t('Failed to load dashboard data'), 'error')
+    }
+  } catch (error) {
+    console.error(error)
+    snackbar.value.show(t('Failed to load dashboard data'), 'error')
+  }
+})
 </script>
 
 <style lang="scss">

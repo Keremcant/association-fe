@@ -19,11 +19,21 @@ const menu = ref([])
 const institutions = ref([])
 const institution = ref()
 const associationData = useCookie('associationData')
+const router = useRouter()
 
 onBeforeMount(async () => {
   try {
     const response = await axios.get(`/institution/${associationData.value.id}/institutions`)
     if (response.status >= 200 && response.status < 300) {
+
+      if(!response.data.isEnable){
+        useCookie('associationToken').value = null
+        useCookie('associationData').value = null
+        useCookie('permission').value=null
+        useCookie('associationAbilityRules').value = null
+        await router.push('/not-authorized')
+      }
+
       const validInstitutions = response.data.institutions.filter(inst => inst.uuid)
 
       institutions.value = validInstitutions.map(inst => ({

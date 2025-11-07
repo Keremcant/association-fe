@@ -21,6 +21,15 @@
         :payload="payload"
       >
         <template #actions="{item}">
+          <IconBtn @click="() => {userUUID = item.item.uuid; updateDialog = true;}">
+            <VIcon icon="tabler-edit" />
+            <VTooltip
+              activator="parent"
+              location="top"
+            >
+              {{ $t('Edit User') }}
+            </VTooltip>
+          </IconBtn>
           <IconBtn @click="deleteUser(item.item.uuid, item.item.firstName)">
             <VIcon icon="tabler-trash" />
             <VTooltip
@@ -55,6 +64,32 @@
         </template>
       </DataTable>
     </VCardItem>
+    <VDialog
+      v-model="updateDialog"
+      scrollablel
+      :overlay="false"
+      transition="dialog-transition"
+
+      max-width="600px"
+    >
+      <DialogCloseBtn @click="updateDialog = false" />
+      <VCard>
+        <VCardTitle class="mt-3">
+          {{ $t('User Update') }}
+        </VCardTitle>
+        <VCardText>
+          <VRow>
+            <VCol cols="12">
+              <UserUpdate
+                :id="userUUID"
+                v-model:is-dialog-visible="updateDialog"
+                @saved="userUpdated"
+              />
+            </VCol>
+          </VRow>
+        </VCardText>
+      </VCard>
+    </VDialog>
     <ConfirmDialog2
       ref="confirmDialog"
       :loading="isLoading"
@@ -73,11 +108,13 @@ import AppTextField from "@core/components/app-form-elements/AppTextField.vue"
 
 const { t } = useI18n()
 const createDialog = ref(false)
+const updateDialog = ref(false)
 const snackbar = ref()
 const isLoading = ref(false)
 const datatable = ref()
 const confirmDialog = ref()
 const userToBeDeletedId = ref()
+const userUUID = ref()
 const search = ref('')
 const payload = ref([])
 const isSendingMail = ref(false)
@@ -110,6 +147,11 @@ async function refr() {
   if(response.status!=null){
     isLoading.value =false
   }
+}
+
+function userUpdated(){
+  updateDialog.value = false
+  snackbar.value.show('Updated User', 'success')
 }
 
 async function confirmDeletion(){

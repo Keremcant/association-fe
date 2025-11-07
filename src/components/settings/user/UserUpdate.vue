@@ -5,30 +5,6 @@
   >
     <VRow>
       <VCol cols="12">
-        <AppTextField
-          v-model="userName"
-          :label="$t('User Name')"
-          :placeholder="$t('User')"
-          :rules="[requiredValidator,emailValidator]"
-        />
-      </VCol>
-      <VCol cols="12">
-        <AppTextField
-          v-model="userFirstName"
-          :label="$t('First Name')"
-          :placeholder="$t('First Name')"
-          :rules="[requiredValidator]"
-        />
-      </VCol>
-      <VCol cols="12">
-        <AppTextField
-          v-model="userLastName"
-          :label="$t('Last Name')"
-          :placeholder="$t('Last Name')"
-          :rules="[requiredValidator]"
-        />
-      </VCol>
-      <VCol cols="12">
         <AppAutocomplete
           v-model="selectedRole"
           :label="$t('Role')"
@@ -86,9 +62,6 @@ const selectedRole = ref()
 async function getUser(){
   const response = await axios.get(`/user-api/${props.id}`)
   if(response.status >= 200 && response.status < 300){
-    userName.value = response.data.username
-    userFirstName.value = response.data.firstName
-    userLastName.value = response.data.lastName
     selectedRole.value = { title: response.data.role.name, value: response.data.role.uuid }
   }
 }
@@ -119,9 +92,6 @@ async function onSubmit(){
     if(valid){
 
       const payload = {
-        username: userName.value,
-        firstName: userFirstName.value,
-        lastName: userLastName.value,
         role: typeof selectedRole.value === 'object' ? selectedRole.value.value : selectedRole.value,
 
       }
@@ -129,7 +99,7 @@ async function onSubmit(){
       isLoading.value=true
 
       try{
-        const response = await axios.put(`/user-api/${props.id}`, payload)
+        const response = await axios.put(`/user-api/update-role/${props.id}`, payload)
         if(response.status >= 200 && response.status < 300){
           emits('saved')
         }else{
