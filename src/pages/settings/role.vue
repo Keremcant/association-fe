@@ -30,24 +30,6 @@
               {{ $t('Go Authorizations') }}
             </VTooltip>
           </IconBtn>
-          <IconBtn @click="() => {selectedRoleId = item.item.uuid; updateDialog = true;}">
-            <VIcon icon="tabler-edit" />
-            <VTooltip
-              activator="parent"
-              location="top"
-            >
-              {{ $t('Edit role') }}
-            </VTooltip>
-          </IconBtn>
-          <IconBtn @click="deleteRole(item.item.uuid, item.item.name)">
-            <VIcon icon="tabler-trash" />
-            <VTooltip
-              activator="parent"
-              location="top"
-            >
-              {{ $t('Delete') }}
-            </VTooltip>
-          </IconBtn>
         </template>
       </DataTable>
     </VCardItem>

@@ -139,7 +139,7 @@ onBeforeMount(async () => {
 async function onSubmit() {
   await formRef.value.validate().then(async ({ valid }) => {
     if (valid) {
-      const payload = { uuid: props.uuid, roleId: props.uuid, moduleIds: selectedModule.value }
+      const payload = { uuid: props.uuid, roleUUID: props.uuid, moduleUUIDs: selectedModule.value }
 
 
       isLoading.value = true

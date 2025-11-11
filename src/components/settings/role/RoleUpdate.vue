@@ -77,7 +77,7 @@ async function onSubmit(){
 
       isLoading.value=true
 
-      const response = await axios.put(`/user-api/role/${props.id}`, payload)
+      const response = await axios.put(`/user-api/update-role/${props.id}`, payload)
       if(response.status >= 200 && response.status < 300){
         emits('saved')
       }else{
