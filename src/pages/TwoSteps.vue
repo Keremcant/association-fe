@@ -185,8 +185,8 @@ const handleSuccessfulLogin = async data => {
   useCookie('associationToken').value = accessToken
 
   await nextTick(() => {
-    const roleRoutes = { ADMIN: '/dashboard/dashboard' }
-    const redirectPath = roleRoutes[userData.role?.name] || '/dashboard/dashboard'
+    const roleRoutes = { ADMIN: '/dashboard/user-dashboard' }
+    const redirectPath = roleRoutes[userData.role?.name] || '/dashboard/user-dashboard'
 
     router.replace(redirectPath)
   })

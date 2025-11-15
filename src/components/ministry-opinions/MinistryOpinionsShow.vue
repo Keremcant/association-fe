@@ -44,7 +44,7 @@ onMounted(async () => {
 
   try {
     const response = await axios.get(
-      `http://localhost:8083/ministryopinions/file/${props.uuid}`,
+      `https://panel-api.ozbakder.com/ministryopinions/file/${props.uuid}`,
       {
         responseType: "blob",
         headers: { Accept: "application/pdf" },
