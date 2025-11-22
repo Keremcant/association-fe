@@ -30,11 +30,14 @@
         :payload="payload"
       >
         <template #actions="{ item }">
-          <IconBtn @click="openUpdate(item.item)">
+          <IconBtn @click="() => {selectedJobPostingUuid = item.item.uuid; updateDialog = true;}">
             <VIcon icon="tabler-edit" />
           </IconBtn>
           <IconBtn @click="deleteMeal(item.item.uuid)">
             <VIcon icon="tabler-trash" />
+          </IconBtn>
+          <IconBtn @click="webPublish(item.item.uuid)">
+            <VIcon icon="tabler-brand-webflow" />
           </IconBtn>
         </template>
       </DataTable>
@@ -52,6 +55,31 @@
         @saved="jobPostingSaved"
       />
     </VDialog>
+    <VDialog
+      v-model="updateDialog"
+      scrollable
+      :overlay="false"
+      transition="dialog-transition"
+      max-width="600px"
+    >
+      <DialogCloseBtn @click="updateDialog = false" />
+      <VCard>
+        <VCardTitle class="mt-3">
+          {{ $t('Job Posting Update') }}
+        </VCardTitle>
+        <VCardText>
+          <VRow>
+            <VCol cols="12">
+              <JobPostingsUpdate
+                v-model:is-dialog-visible="updateDialog"
+                :uuid="selectedJobPostingUuid"
+                @saved="jobPostingUpdated"
+              />
+            </VCol>
+          </VRow>
+        </VCardText>
+      </VCard>
+    </VDialog>
 
     <ConfirmDialog2
       ref="confirmDialog"
@@ -68,6 +96,7 @@ import { useI18n } from 'vue-i18n'
 import axios from '@/plugins/axios'
 import DataTable from '@/components/datatable/DataTable.vue'
 import JobPostingForm from "@/components/job-posting/JobPostingForm.vue"
+import JobPostingsUpdate from "@/components/job-posting/JobPostingsUpdate.vue"
 
 const { t } = useI18n()
 const datatable = ref()
@@ -75,9 +104,11 @@ const snackbar = ref()
 const confirmDialog = ref()
 const isLoading = ref(false)
 const formDialog = ref(false)
+const updateDialog = ref(false)
 const isUpdate = ref(false)
 const selectedId = ref(null)
 const payload = ref([])
+const selectedJobPostingUuid = ref()
 
 const headers = computed(() => [
   { title: t('Institution Name'), key: 'institution.institutionName', sortable: true },
@@ -98,8 +129,10 @@ function openCreate() {
   formDialog.value = true
 }
 
-function openUpdate(item) {
-  formDialog.value = true
+function jobPostingUpdated(){
+  datatable.value.refresh()
+  updateDialog.value = false
+  snackbar.value.show('Updated Job Postings', 'success')
 }
 
 function jobPostingSaved(){
@@ -115,6 +148,14 @@ function closeDialog() {
 function deleteMeal(id) {
   selectedId.value = id
   confirmDialog.value.show(t('Delete'), t('Are you sure you want to delete this record?'))
+}
+
+async function webPublish(uuid) {
+  const response = await axios.put(`/job-posting/${uuid}/web-pushing`)
+  if (response.status >= 200 && response.status < 300) {
+    snackbar.value.show(t('Web Pushing successfully'), 'success')
+
+  }
 }
 
 async function confirmDeletion() {

@@ -85,7 +85,11 @@ function showCv(item) {
 
 const headers = computed(() => [
   { title: t('Title'), key: 'title' },
-  { title: t('Tags'), key: 'tagsAsString' },
+  {
+    title: t('Tags'),
+    key: 'tag', // backend filtre için entity alanı
+    value: item => item.tagsAsString, // frontend gösterim için DTO alanı
+  },
   {
     title: t('Decision Date'),
     key: 'decisionDate',

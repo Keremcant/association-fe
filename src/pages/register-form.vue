@@ -319,10 +319,13 @@ const requiredValidator = val => (!!val ? true : t('This field is required'))
 
 const nationalIdValidator = val => {
   if (!val) return t('This field is required')
-  if (!/^\d{11}$/.test(val)) return t('TR Identity No must be 11 digits')
-
+  if (!/^\d{11}$/.test(val) && !/^\d{2}\*{7}\d{2}$/.test(val))
+    return t('TR Identity No must be 11 digits')
+  
   return true
 }
+
+
 
 const phoneValidator = val => {
   if (!val) return t('This field is required')

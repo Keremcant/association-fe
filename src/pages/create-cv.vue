@@ -1,6 +1,7 @@
 <template>
   <div class="auth-wrapper d-flex align-center justify-center pa-4">
     <div class="position-relative my-sm-16">
+      <!-- Top / Bottom Shapes -->
       <VNodeRenderer
         :nodes="h('div', { innerHTML: authV1TopShape })"
         class="text-primary auth-v1-top-shape d-none d-sm-block"
@@ -15,6 +16,7 @@
         max-width="1200"
         :class="$vuetify.display.smAndUp ? 'pa-6' : 'pa-0'"
       >
+        <!-- Logo -->
         <VCardItem class="justify-center">
           <VCardTitle>
             <RouterLink to="/">
@@ -56,12 +58,14 @@
               </VBtn>
             </div>
           </template>
+
           <template v-else>
             <VForm
               ref="formRef"
               @submit.prevent="onSubmit"
             >
               <VRow>
+                <!-- Basic Info -->
                 <VCol
                   cols="12"
                   md="6"
@@ -122,7 +126,7 @@
                 >
                   <AppAutocomplete
                     v-model="form.educationStatus"
-                    :items="[$t('Bachelor'), $t('Associate'), $t('Master')]"
+                    :items="[$t('Primary School'), $t('Middle School'), $t('High School'), $t('Associate Degree'), $t('Bachelor’s Degree'), $t('Master’s Degree')]"
                     :label="$t('Education Status')"
                     :rules="[requiredValidator]"
                   />
@@ -179,6 +183,7 @@
                 </VCol>
               </VRow>
 
+              <!-- Education Section -->
               <h4 class="mt-8 mb-2">
                 {{ $t('Education') }}
               </h4>
@@ -242,6 +247,7 @@
                 {{ $t('Add Education') }}
               </VBtn>
 
+              <!-- Work Experience Section -->
               <h4 class="mt-8 mb-2">
                 {{ $t('Work Experience') }}
               </h4>
@@ -250,25 +256,30 @@
                 :key="'work-' + index"
                 class="dynamic-section"
               >
-                <VRow>
+                <VRow
+                  class="align-center flex-nowrap"
+                  style="gap: 8px;"
+                >
                   <VCol
                     cols="12"
-                    md="3"
+                    md="2"
                   >
                     <AppTextField
                       v-model="job.company"
                       :label="$t('Company Name')"
                       :rules="[requiredValidator]"
+                      dense
                     />
                   </VCol>
                   <VCol
                     cols="12"
-                    md="3"
+                    md="2"
                   >
                     <AppTextField
                       v-model="job.position"
                       :label="$t('Position')"
                       :rules="[requiredValidator]"
+                      dense
                     />
                   </VCol>
                   <VCol
@@ -279,6 +290,7 @@
                       v-model="job.startDate"
                       type="date"
                       :label="$t('Start Date')"
+                      dense
                     />
                   </VCol>
                   <VCol
@@ -286,15 +298,36 @@
                     md="2"
                   >
                     <AppTextField
+                      v-if="!job.currentlyWorking"
                       v-model="job.endDate"
                       type="date"
                       :label="$t('End Date')"
+                      dense
+                    />
+                    <div
+                      v-else
+                      class="mt-4 text-center"
+                    >
+                      {{ $t('Present') }}
+                    </div>
+                  </VCol>
+                  <VCol
+                    cols="12"
+                    md="2"
+                    class="d-flex align-center"
+                  >
+                    <VCheckbox
+                      v-model="job.currentlyWorking"
+                      :label="$t('Currently Working')"
+                      hide-details
+                      dense
+                      @change="onCurrentlyWorkingChange(job)"
                     />
                   </VCol>
                   <VCol
                     cols="12"
                     md="1"
-                    class="d-flex align-center justify-center mt-4"
+                    class="d-flex align-center justify-center"
                   >
                     <VBtn
                       icon="tabler-trash"
@@ -314,6 +347,7 @@
                 {{ $t('Add Work') }}
               </VBtn>
 
+              <!-- Certificates Section -->
               <h4 class="mt-8 mb-2">
                 {{ $t('Certificates') }}
               </h4>
@@ -376,6 +410,7 @@
                 {{ $t('Add Certificate') }}
               </VBtn>
 
+              <!-- Submit -->
               <VCol
                 cols="12"
                 class="d-flex justify-center mt-6"
@@ -452,18 +487,18 @@ const form = ref({
 })
 
 const requiredValidator = val => (!!val ? true : t('This field is required'))
+const phoneValidator = val => (!val ? t('This field is required') : !/^0\d{10}$/.test(val) ? t('Phone must start with 0 and be 11 digits') : true)
 
-const phoneValidator = val => {
-  if (!val) return t('This field is required')
-  if (!/^0\d{10}$/.test(val)) return t('Phone must start with 0 and be 11 digits')
-  
-  return true
-}
-
+// Education
 const addEducation = () => form.value.education.push({ school: '', department: '', graduationYear: '' })
 const removeEducation = index => form.value.education.splice(index, 1)
-const addWork = () => form.value.work.push({ company: '', position: '', startDate: '', endDate: '' })
+
+// Work
+const addWork = () => form.value.work.push({ company: '', position: '', startDate: '', endDate: '', currentlyWorking: false })
 const removeWork = index => form.value.work.splice(index, 1)
+const onCurrentlyWorkingChange = job => { job.currentlyWorking ? job.endDate = '9999-12-31' : job.endDate = '' }
+
+// Certificates
 const addCertificate = () => form.value.certificates.push({ title: '', institution: '', date: '' })
 const removeCertificate = index => form.value.certificates.splice(index, 1)
 
@@ -487,27 +522,13 @@ const onSubmit = async () => {
   }
 }
 
-const goToLogin = () => {
-  router.push({ name: 'login' })
-}
+const goToLogin = () => { router.push({ name: 'login' }) }
 </script>
 
 <style lang="scss">
 @use "@core/scss/template/pages/page-auth";
-.border-top {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-}
-.v-card {
-  transition: box-shadow 0.2s ease-in-out;
-  &:hover {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  }
-}
-.v-btn {
-  text-transform: none;
-  font-weight: 500;
-}
-.v-field__input {
-  font-size: 0.95rem;
-}
+.v-card { transition: box-shadow 0.2s ease-in-out; &:hover { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); } }
+.v-btn { text-transform: none; font-weight: 500; }
+.v-field__input { font-size: 0.95rem; }
+.dynamic-section { margin-bottom: 12px; }
 </style>

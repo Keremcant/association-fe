@@ -211,7 +211,7 @@
               md="3"
             >
               <AppTextField
-                v-model="job.endDate"
+                :value="job.endDate === '31.12.9999' ? t('Present') : job.endDate"
                 :label="$t('End Date')"
                 disabled
               />
@@ -270,6 +270,7 @@ import axios from '@/plugins/axios'
 import AppTextField from '@core/components/app-form-elements/AppTextField.vue'
 import AppTextarea from '@core/components/app-form-elements/AppTextarea.vue'
 import { DateTime } from 'luxon'
+import { useI18n } from "vue-i18n"
 
 const props = defineProps({
   uuid: String,
@@ -293,7 +294,7 @@ const form = ref({
 })
 
 const isLoading = ref(false)
-
+const { t } = useI18n()
 
 const fetchCv = async () => {
   if (!props.uuid) return

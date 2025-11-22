@@ -10,7 +10,7 @@
       <VCard class="flex-grow-1">
         <VCardText class="text-center pt-12 pb-6">
           <h5 class="text-h5 mt-4">
-            {{ user.companyName }}
+            {{ user.institutionName }}
           </h5>
         </VCardText>
 
@@ -50,13 +50,21 @@
         </VCardText>
 
         <VCardText class="d-flex justify-center gap-x-4 pb-8">
-          <VBtn
-            variant="elevated"
-            color="primary"
-            @click="openEditDialog(user)"
-          >
-            {{ t('Edit') }}
-          </VBtn>
+          <template v-if="user.updatable === true || user.updatable === 'true'">
+            <VBtn
+              variant="elevated"
+              color="primary"
+              @click="openEditDialog(user)"
+            >
+              {{ t('Edit') }}
+            </VBtn>
+          </template>
+          <template v-else>
+            <p class="text-body-1 text-grey-darken-1">
+              Kurum bilginizi güncellemek istiyorsanız. Hafta içi 09:00 – 17:30 saatleri arasında
+              <a>0532 467 91 32</a> numarası ile iletişime geçiniz. {{ user.updatable }}
+            </p>
+          </template>
         </VCardText>
       </VCard>
     </VCol>

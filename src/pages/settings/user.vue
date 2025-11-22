@@ -51,6 +51,15 @@
               {{ $t('Kullanıcıyı Aktifleştir / Pasifleştir') }}
             </VTooltip>
           </IconBtn>
+          <IconBtn @click="userUpdatable(item.item.uuid)">
+            <VIcon icon="tabler-user-edit" />
+            <VTooltip
+              activator="parent"
+              location="top"
+            >
+              {{ $t('User Updatable') }}
+            </VTooltip>
+          </IconBtn>
         </template>
         <template #status="{ item }">
           <VChip
@@ -60,6 +69,16 @@
             class="text-capitalize"
           >
             {{ statusName(item.item.isEnable) }}
+          </VChip>
+        </template>
+        <template #userUpdatable="{ item }">
+          <VChip
+            :color="statusColor(item.item.updatable)"
+            size="small"
+            label
+            class="text-capitalize"
+          >
+            {{ userUpdatableName(item.item.updatable) }}
           </VChip>
         </template>
       </DataTable>
@@ -202,12 +221,58 @@ const sendUserMail = async uuid => {
   }
 }
 
+const userUpdatable = async uuid => {
+  if (!uuid) {
+    snackbar.value.show('Geçersiz kullanıcı bilgisi.', 'error')
+    
+    return
+  }
+
+  isSendingMail.value = true
+
+  try {
+    const { data } = await axios.put(`/user-api/${uuid}/toggle-updatable`)
+
+    // Backend'ten dönen değer doğru mu?
+    if (typeof data.updatable !== 'boolean') {
+      snackbar.value.show('Sunucudan geçersiz yanıt alındı.', 'error')
+      
+      return
+    }
+
+    const msg = data.updatable
+      ? 'Kullanıcı güncelleme yetkisi AKTİF edildi.'
+      : 'Kullanıcı güncelleme yetkisi PASİF edildi.'
+
+    snackbar.value.show(msg, 'success')
+
+    // Tabloyu güncelle
+    datatable.value.refresh()
+
+  } catch (error) {
+    console.error(error)
+    snackbar.value.show('İşlem başarısız oldu. Tekrar deneyin.', 'error')
+
+  } finally {
+    isSendingMail.value = false
+  }
+}
+
+
 
 const statusName = status => {
   if (status === false) {
     return 'ONAYLANMADI'
   } else {
     return 'ONAYLANDI'
+  }
+}
+
+const userUpdatableName = status => {
+  if (status === true) {
+    return 'Güncellenebilir'
+  } else {
+    return 'Güncellenemez'
   }
 }
 
@@ -251,6 +316,12 @@ const headers = computed(() =>[
     align: 'start',
     sortable: true,
     key: 'status',
+  },
+  {
+    title: t('User Updatable'),
+    align: 'start',
+    sortable: true,
+    key: 'userUpdatable',
   },
   {
     title: t('Actions'),

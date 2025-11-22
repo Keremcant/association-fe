@@ -99,6 +99,18 @@
         />
       </template>
 
+      <template #[`item.userUpdatable`]="{ item }">
+        <slot
+          name="userUpdatable"
+          :item="{ item }"
+        />
+      </template>
+      <template #[`item.institutionUpdatable`]="{ item }">
+        <slot
+          name="institutionUpdatable"
+          :item="{ item }"
+        />
+      </template>
       <template #[`item.DateTime`]="{ item }">
         <slot
           name="DateTime"
@@ -137,8 +149,6 @@ const selectedInclude = ref()
 const include = ref([
   { value: ":", title: 'İçeren' },
   { value: "=", title: 'Eşittir' },
-  { value: ">", title: 'Büyüktür' },
-  { value: "<", title: 'Küçüktür' },
 ])
 
 const isSearchEnabled = computed(() => {

@@ -289,5 +289,11 @@
   "Edit": "Düzenle",
   "Company Details": "Kurum Detayları",
   "Update": "Güncelle",
-  "Edit Company": "Kurumu Düzenle"
+  "Edit Company": "Kurumu Düzenle",
+  "Primary School": "İlkokul",
+  "Middle School": "Ortaokul",
+  "High School": "Lise",
+  "Associate Degree": "Önlisans",
+  "Bachelor’s Degree": "Lisans",
+  "Master’s Degree": "Yüksek Lisans"
 }

@@ -7,6 +7,7 @@
         <VCardText>
           <VForm>
             <VRow>
+              <!-- First Name -->
               <VCol
                 cols="12"
                 md="6"
@@ -15,9 +16,11 @@
                   v-model="accountDataLocal.firstName"
                   :label="t('First Name')"
                   :placeholder="t('First Name')"
+                  :disabled="!updatable"
                 />
               </VCol>
 
+              <!-- Last Name -->
               <VCol
                 cols="12"
                 md="6"
@@ -26,9 +29,11 @@
                   v-model="accountDataLocal.lastName"
                   :label="t('Last Name')"
                   :placeholder="t('Last Name')"
+                  :disabled="!updatable"
                 />
               </VCol>
 
+              <!-- Email -->
               <VCol
                 cols="12"
                 md="6"
@@ -37,9 +42,11 @@
                   v-model="accountDataLocal.email"
                   :label="t('Email')"
                   :placeholder="t('Email')"
+                  :disabled="!updatable"
                 />
               </VCol>
 
+              <!-- Phone -->
               <VCol
                 cols="12"
                 md="6"
@@ -48,9 +55,11 @@
                   v-model="accountDataLocal.phone"
                   :label="t('Phone')"
                   :placeholder="t('Phone')"
+                  :disabled="!updatable"
                 />
               </VCol>
 
+              <!-- TR Identity No -->
               <VCol
                 cols="12"
                 md="6"
@@ -59,29 +68,31 @@
                   v-model="accountDataLocal.identityNumber"
                   :label="t('TR Identity No')"
                   :placeholder="t('TR Identity No')"
+                  :disabled="!updatable"
                 />
               </VCol>
 
+              <!-- Güncelle Butonu veya Bilgi Mesajı -->
               <VCol
                 cols="12"
-                class="d-flex gap-4"
+                class="d-flex flex-column gap-2 mt-4"
               >
-                <VBtn
-                  color="primary"
-                  :loading="isLoading"
-                  @click.prevent="saveChanges"
-                >
-                  {{ t('Update') }}
-                </VBtn>
+                <template v-if="updatable">
+                  <VBtn
+                    color="primary"
+                    :loading="isLoading"
+                    @click.prevent="saveChanges"
+                  >
+                    {{ t('Update') }}
+                  </VBtn>
+                </template>
 
-                <VBtn
-                  color="secondary"
-                  variant="tonal"
-                  :disabled="isLoading"
-                  @click="cancelChanges"
-                >
-                  {{ t('Cancel') }}
-                </VBtn>
+                <template v-else>
+                  <p class="text-body-1 text-grey-darken-1">
+                    Profil bilginizi güncellemek istiyorsanız. Hafta içi 09:00 – 17:30 saatleri arasında
+                    <a>0532 467 91 32</a> numarası ile iletişime geçiniz.
+                  </p>
+                </template>
               </VCol>
             </VRow>
           </VForm>
@@ -92,6 +103,7 @@
 
   <SnackBar ref="snackbar" />
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -119,6 +131,7 @@ const accountDataLocal = ref({
 const userUUID = ref(null)
 const isLoading = ref(false)
 const snackbar = ref()
+const updatable = ref()
 
 const getUserData = async () => {
   try {
@@ -140,6 +153,7 @@ const getUserData = async () => {
     accountDataLocal.value.email = user.email || ''
     accountDataLocal.value.phone = user.gsm || ''
     accountDataLocal.value.identityNumber = user.identityNumber || ''
+    updatable.value = user.updatable
   } catch (error) {
     console.error('Kullanıcı verisi alınamadı:', error)
   } finally {
@@ -164,6 +178,7 @@ const saveChanges = async () => {
 
     if (response.status >= 200 && response.status < 300) {
       snackbar.value.show('Profile Updated.', 'success')
+      getUserData()
     }
   } catch (err) {
     console.error('Güncelleme hatası:', err)

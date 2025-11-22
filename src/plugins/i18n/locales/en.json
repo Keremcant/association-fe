@@ -428,5 +428,11 @@
   "Edit": "Edit",
   "Company Details": "Company Details",
   "Update": "Update",
-  "Edit Company": "Edit Company"
+  "Edit Company": "Edit Company",
+  "Primary School": "Primary School",
+  "Middle School": "Middle School",
+  "High School": "High School",
+  "Associate Degree": "Associate Degree",
+  "Bachelor’s Degree": "Bachelor’s Degree",
+  "Master’s Degree": "Master’s Degree"
 }

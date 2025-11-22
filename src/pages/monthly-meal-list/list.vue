@@ -17,7 +17,7 @@
       <DataTable
         ref="datatable"
         :headers="headers"
-        endpoint="/meallist/get-all-by-filter"
+        endpoint="/meallist/get-meal-list-by-institution"
         :payload="payload"
       >
         <template #actions="{ item }">

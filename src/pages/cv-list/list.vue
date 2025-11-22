@@ -27,6 +27,15 @@
               {{ $t('Show Cv') }}
             </VTooltip>
           </IconBtn>
+          <IconBtn @click="deleteCv(item.item.uuid, item.item.fullName)">
+            <VIcon icon="tabler-trash" />
+            <VTooltip
+              activator="parent"
+              location="top"
+            >
+              {{ $t('Delete') }}
+            </VTooltip>
+          </IconBtn>
         </template>
       </DataTable>
     </VCardItem>
@@ -48,6 +57,12 @@
       </VCard>
     </VDialog>
   </VCard>
+  <ConfirmDialog2
+    ref="confirmDialog"
+    :loading="isLoading"
+    @confirm="confirmDeletion"
+  />
+  <SnackBar ref="snackbar" />
 </template>
 
 <script setup>
@@ -55,6 +70,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CvListForm from '@/components/cv-list/CvListForm.vue'
 import DataTable from "@/components/datatable/DataTable.vue"
+import axios from "@/plugins/axios.js"
 
 const { t } = useI18n()
 
@@ -63,6 +79,10 @@ const updateDialog = ref(false)
 const selectedUUID = ref()
 const payload = ref([])
 const datatable = ref()
+const snackbar = ref()
+const isLoading = ref(false)
+const confirmDialog = ref()
+const cvToBeDeletedUuid = ref()
 
 const headers = [
   { title: t('Name Surname'), key: 'fullName' },
@@ -73,6 +93,28 @@ const headers = [
   { title: t('Actions'), key: 'actions', sortable: false },
 ]
 
+async function confirmDeletion(){
+  isLoading.value = true
+
+  const response = await axios.delete(`/cvlist/${cvToBeDeletedUuid.value}`)
+  if(response.status >= 200 && response.status < 300){
+    confirmDialog.value.hide()
+    snackbar.value.show('CV Deleted', 'success')
+    datatable.value.refresh()
+    isLoading.value = false
+  }else{
+    snackbar.value.show('anErrorOccurredPleaseTryAgainLater', 'error')
+    isLoading.value = true
+    setTimeout(() => {
+      isLoading.value = false
+    }, 500)
+  }
+}
+function deleteCv(uuid, title){
+
+  cvToBeDeletedUuid.value = uuid
+  confirmDialog.value.show('Delete', `${title}` )
+}
 
 function refresh() {}
 

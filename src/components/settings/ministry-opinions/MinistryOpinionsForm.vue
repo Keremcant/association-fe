@@ -29,11 +29,11 @@
 
       <!-- Decision Date -->
       <VCol cols="12">
-        <AppDateTimePicker
+        <AppTextField
           v-model="decisionDate"
           :label="$t('Decision Date')"
+          type="date"
           :rules="[requiredValidator]"
-          placeholder="YYYY-MM-DD"
         />
       </VCol>
 

@@ -9,12 +9,31 @@
           </h5>
 
           <p class="mb-2">
-            Toplam Alacak Tutarı
+            {{ debtTitle }}
           </p>
-
-          <!-- 🔹 Toplam alacak tutarı (örnek: 120.000 TL) -->
           <h4 class="text-h4 text-primary mb-1">
-            {{ formatCurrency(data?.totalReceivableAmount) }}
+            <template v-if="data?.totalReceivableAmount > 0">
+              {{ formatCurrency(data?.totalReceivableAmount) }}
+
+              <!-- 📌 Tarih kısmı -->
+              <div
+                v-if="data?.lastDebtCreatedDate"
+                class="text-body-2 text-grey-darken-1 mt-1"
+              >
+                {{ formatDate(data.lastDebtCreatedDate) }}
+              </div>
+
+              <div
+                v-else
+                class="text-body-2 text-grey-darken-1 mt-1"
+              >
+                Tarih bilgisi bulunmamaktadır
+              </div>
+            </template>
+
+            <template v-else>
+              Aidat Borcunuz bulunmamaktadır
+            </template>
           </h4>
         </VCardText>
       </VCol>
@@ -34,6 +53,7 @@
 
 <script setup>
 import congoImg from '@images/illustrations/congo-illustration.png'
+import { ref } from "vue"
 
 const props = defineProps({
   data: {
@@ -43,11 +63,33 @@ const props = defineProps({
   },
 })
 
+const route = useRoute()
+
+console.log(route.name)
+
+const debtTitle = computed(() => {
+  if (route.name === 'dashboard-dashboard') return 'Toplam borç'
+  if (route.name === 'dashboard-user-dashboard') return 'Üye Aidat Borcu'
+  
+  return 'Borç Bilgisi'
+})
+
 // 🔹 Para formatlamak için küçük yardımcı fonksiyon
 const formatCurrency = amount => {
   if (!amount) return '0 TL'
   
   return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount)
+}
+
+const formatDate = dateString => {
+  if (!dateString) return null
+  const date = new Date(dateString)
+
+  return date.toLocaleDateString('tr-TR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 }
 </script>
 

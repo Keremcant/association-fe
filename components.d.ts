@@ -51,6 +51,7 @@ declare module 'vue' {
     ErrorHeader: typeof import('./src/components/ErrorHeader.vue')['default']
     I18n: typeof import('./src/@core/components/I18n.vue')['default']
     JobPostingForm: typeof import('./src/components/job-posting/JobPostingForm.vue')['default']
+    JobPostingsUpdate: typeof import('./src/components/job-posting/JobPostingsUpdate.vue')['default']
     MealListForm: typeof import('./src/components/settings/monthly-meal-list/MealListForm.vue')['default']
     MealListUpdate: typeof import('./src/components/settings/monthly-meal-list/MealListUpdate.vue')['default']
     MemberDebtListForm: typeof import('./src/components/settings/member-debt-list/MemberDebtListForm.vue')['default']

@@ -1,7 +1,11 @@
 <template>
   <VCardText>
+    <div v-if="loading">
+      {{ $t('Dosya yükleniyor') }}...
+    </div>
+
     <div
-      v-if="pdfSrc"
+      v-else-if="pdfSrc"
       ref="pdfWrapper"
       style="width:100%; height:80vh; user-select: none;"
       @contextmenu.prevent
@@ -10,11 +14,13 @@
     >
       <PDF :src="pdfSrc" />
     </div>
+
     <p v-else>
       {{ $t('PDF yüklenemedi') }}
     </p>
   </VCardText>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from "vue"
@@ -27,8 +33,8 @@ const props = defineProps({
 
 const pdfSrc = ref(null)
 const pdfWrapper = ref(null)
+const loading = ref(true)
 
-// Blob -> Base64 dönüştürücü
 function blobToBase64(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -47,6 +53,7 @@ onMounted(async () => {
       `https://panel-api.ozbakder.com/ministryopinions/file/${props.uuid}`,
       {
         responseType: "blob",
+        validateStatus: status => status >= 200 && status < 300,
         headers: { Accept: "application/pdf" },
       },
     )
@@ -55,7 +62,6 @@ onMounted(async () => {
 
     pdfSrc.value = base64
 
-    // Klavye tuşlarını engelle
     pdfWrapper.value?.addEventListener("keydown", e => {
       if ((e.ctrlKey || e.metaKey) && ["s", "p", "c", "x"].includes(e.key.toLowerCase())) {
         e.preventDefault()
@@ -64,6 +70,9 @@ onMounted(async () => {
   } catch (err) {
     console.error("PDF yüklenemedi", err)
     pdfSrc.value = null
+  } finally {
+    loading.value = false
   }
 })
 </script>
+
