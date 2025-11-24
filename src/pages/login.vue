@@ -137,6 +137,18 @@ const isLoading = ref(false)
 const credentials = ref({ email: '', password: '' })
 const errors = ref({ email: undefined, password: undefined })
 
+function toBase64(txt)
+{
+  // TextEncoder: Always UTF8
+  const uint8Array = new TextEncoder().encode(txt)
+  let binary = ''
+
+  for (let i = 0; i < uint8Array.length; ++i)
+    binary += String.fromCharCode(uint8Array[i])
+
+  return btoa(binary)
+}
+
 const onSubmitLogin = async () => {
   const { valid } = await refVForm.value.validate()
   if (!valid) return
@@ -145,7 +157,7 @@ const onSubmitLogin = async () => {
   try {
     const res = await axios.post('/auth/login', {
       email: credentials.value.email,
-      password: btoa(credentials.value.password),
+      password: toBase64(credentials.value.password),
     })
 
     if (res.status >= 200 && res.status < 300) {

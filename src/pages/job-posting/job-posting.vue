@@ -27,6 +27,7 @@
         ref="datatable"
         :headers="headers"
         endpoint="/job-posting/get-all-by-filter"
+        excel-endpoint="/job-posting/export/excel"
         :payload="payload"
       >
         <template #actions="{ item }">

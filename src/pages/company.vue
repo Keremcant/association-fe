@@ -62,7 +62,7 @@
           <template v-else>
             <p class="text-body-1 text-grey-darken-1">
               Kurum bilginizi güncellemek istiyorsanız. Hafta içi 09:00 – 17:30 saatleri arasında
-              <a>0532 467 91 32</a> numarası ile iletişime geçiniz. {{ user.updatable }}
+              <a>0532 467 91 32</a> numarası ile iletişime geçiniz.
             </p>
           </template>
         </VCardText>

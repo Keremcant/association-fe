@@ -15,6 +15,7 @@
         ref="datatable"
         :headers="headers"
         endpoint="/cvlist/get-all-by-filter"
+        excel-endpoint="/cvlist/export/excel"
         :payload="payload"
       >
         <template #actions="{ item }">

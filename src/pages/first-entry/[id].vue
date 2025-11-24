@@ -119,13 +119,26 @@ const requiredValidator = v => !!v || t('This field is required')
 const passwordValidator = v => v.length >= 6 || t('New password must be at least 6 characters long and contain at least one special character')
 const matchPasswordValidator = v => v === credentials.value.newPassword || t('New password and confirmation password do not match')
 
+function toBase64(txt)
+{
+  // TextEncoder: Always UTF8
+  const uint8Array = new TextEncoder().encode(txt)
+  let binary = ''
+
+  for (let i = 0; i < uint8Array.length; ++i)
+    binary += String.fromCharCode(uint8Array[i])
+
+  return btoa(binary)
+}
+
+
 const onSubmit = async () => {
   if (refVForm.value.validate()) {
 
     const payload = {
-      oldPassword: btoa(credentials.value.currentPassword), // Base64 encode
-      newPassword: btoa(credentials.value.newPassword),
-      confirmPassword: btoa(credentials.value.confirmPassword),
+      oldPassword: toBase64(credentials.value.currentPassword), // Base64 encode
+      newPassword: toBase64(credentials.value.newPassword),
+      confirmPassword: toBase64(credentials.value.confirmPassword),
     }
 
     isLoading.value = true
