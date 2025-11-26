@@ -77,6 +77,7 @@ import { onBeforeMount, ref } from "vue"
 // eslint-disable-next-line import/extensions
 import axios from "@/plugins/axios.js"
 import { useRoute } from "vue-router"
+import { useI18n } from "vue-i18n"
 
 const route = useRoute()
 const uuid = ref(route.params.id)
@@ -86,6 +87,7 @@ const selectedAuth = ref([])
 const isLoading = ref(false)
 const formRef = ref()
 const snackbar = ref()
+const { t } = useI18n()
 
 
 async function fetchAuths() {

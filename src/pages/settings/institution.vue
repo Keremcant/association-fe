@@ -11,7 +11,9 @@
         />
       </template>
     </VCardItem>
+
     <VDivider />
+
     <VCardItem>
       <DataTable
         ref="datatable"
@@ -20,7 +22,17 @@
         excel-endpoint="/institution/export/excel"
         :payload="payload"
       >
-        <template #actions="{item}">
+        <template #actions="{ item }">
+          <IconBtn @click="showInstitution(item.item)">
+            <VIcon icon="tabler-eye" />
+            <VTooltip
+              activator="parent"
+              location="top"
+            >
+              {{ $t('Show Institution') }}
+            </VTooltip>
+          </IconBtn>
+
           <IconBtn @click="institutionUpdatable(item.item.uuid)">
             <VIcon icon="tabler-user-edit" />
             <VTooltip
@@ -31,6 +43,7 @@
             </VTooltip>
           </IconBtn>
         </template>
+
         <template #institutionUpdatable="{ item }">
           <VChip
             :color="statusColor(item.item.updatable)"
@@ -43,21 +56,115 @@
         </template>
       </DataTable>
     </VCardItem>
+
     <ConfirmDialog2
       ref="confirmDialog"
       :loading="isLoading"
       @confirm="confirmDeletion"
     />
     <SnackBar ref="snackbar" />
+
+    <VDialog
+      v-model="showDialog"
+      max-width="1200"
+    >
+      <div class="d-flex align-center justify-center pa-4">
+        <VCard
+          class="auth-card"
+          max-width="1200"
+          :class="$vuetify.display.smAndUp ? 'pa-6' : 'pa-0'"
+        >
+          <VCardTitle class="text-center mb-2">
+            {{ $t('Institution Details') }}
+          </VCardTitle>
+
+          <VCardText>
+            <VRow>
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="selectedInstitution.institutionName"
+                  :label="$t('Institution')"
+                  disabled
+                />
+              </VCol>
+
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="selectedInstitution.institutionRegion"
+                  :label="$t('Institution Region')"
+                  disabled
+                />
+              </VCol>
+
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="selectedInstitution.institutionProvince"
+                  :label="$t('Institution Province')"
+                  disabled
+                />
+              </VCol>
+
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="selectedInstitution.institutionPhone"
+                  :label="$t('Phone')"
+                  disabled
+                />
+              </VCol>
+
+              <VCol
+                cols="12"
+                md="6"
+              >
+                <AppTextField
+                  v-model="selectedInstitution.institutionMail"
+                  :label="$t('Email')"
+                  disabled
+                />
+              </VCol>
+
+              <VCol cols="12">
+                <AppTextField
+                  v-model="selectedInstitution.institutionAddress"
+                  :label="$t('Address')"
+                  disabled
+                />
+              </VCol>
+            </VRow>
+          </VCardText>
+
+          <VCardActions class="justify-end">
+            <VBtn
+              color="primary"
+              @click="showDialog = false"
+            >
+              {{ $t('Close') }}
+            </VBtn>
+          </VCardActions>
+        </VCard>
+      </div>
+    </VDialog>
   </VCard>
 </template>
+
 
 <script setup>
 import DataTable from '@/components/datatable/DataTable.vue'
 import axios from "@/plugins/axios.js"
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import AppTextField from "@core/components/app-form-elements/AppTextField.vue"
 
 const { t } = useI18n()
 const snackbar = ref()
@@ -68,6 +175,14 @@ const institutionToBeDeletedId = ref()
 const search = ref('')
 const payload = ref([])
 const isSendingMail = ref(false)
+
+const showDialog = ref(false)
+const selectedInstitution = ref({})
+
+function showInstitution(item) {
+  selectedInstitution.value = { ...item }
+  showDialog.value = true
+}
 
 function filter(){
   if(search.value){
@@ -125,7 +240,7 @@ function statusColor(status) {
 const institutionUpdatable = async uuid => {
   if (!uuid) {
     snackbar.value.show('Geçersiz kullanıcı bilgisi.', 'error')
-
+    
     return
   }
 
@@ -133,11 +248,9 @@ const institutionUpdatable = async uuid => {
 
   try {
     const { data } = await axios.put(`/institution/${uuid}/toggle-updatable`)
-
-    // Backend'ten dönen değer doğru mu?
     if (typeof data.updatable !== 'boolean') {
       snackbar.value.show('Sunucudan geçersiz yanıt alındı.', 'error')
-
+      
       return
     }
 
@@ -146,83 +259,29 @@ const institutionUpdatable = async uuid => {
       : 'Kurum güncelleme yetkisi PASİF edildi.'
 
     snackbar.value.show(msg, 'success')
-
-    // Tabloyu güncelle
     datatable.value.refresh()
 
   } catch (error) {
-    console.error(error)
     snackbar.value.show('İşlem başarısız oldu. Tekrar deneyin.', 'error')
-
   } finally {
     isSendingMail.value = false
   }
 }
 
-
 const institutionUpdatableName = status => {
-  if (status === true) {
-    return 'Güncellenebilir'
-  } else {
-    return 'Güncellenemez'
-  }
+  if (status === true) return 'Güncellenebilir'
+  
+  return 'Güncellenemez'
 }
 
 const headers = computed(() =>[
-  {
-    title: t('Index'),
-    align: 'start',
-    sortable: true,
-    key: 'index',
-  },
-  {
-    title: t('Institution'),
-    align: 'start',
-    sortable: true,
-    type: 'String',
-    key: 'institutionName',
-  },
-  {
-    title: t('Institution Region'),
-    align: 'start',
-    sortable: true,
-    type: 'String',
-    key: 'institutionRegion',
-  },
-  {
-    title: t('Institution Province'),
-    align: 'start',
-    sortable: true,
-    type: 'String',
-    key: 'institutionProvince',
-  },
-  {
-    title: t('Phone'),
-    align: 'start',
-    sortable: true,
-    type: 'String',
-    key: 'institutionPhone',
-  },
-  {
-    title: t('Email'),
-    align: 'start',
-    sortable: true,
-    type: 'String',
-    key: 'institutionMail',
-  },
-  {
-    title: t('Institution Updatable'),
-    align: 'start',
-    sortable: true,
-    key: 'institutionUpdatable',
-  },
-  {
-    title: t('Actions'),
-    align: 'start',
-    sortable: false,
-    key: 'actions',
-  },
-],
-)
+  { title: t('Index'), key: 'index', sortable: true },
+  { title: t('Institution'), key: 'institutionName', sortable: true },
+  { title: t('Institution Region'), key: 'institutionRegion', sortable: true },
+  { title: t('Institution Province'), key: 'institutionProvince', sortable: true },
+  { title: t('Phone'), key: 'institutionPhone', sortable: true },
+  { title: t('Email'), key: 'institutionMail', sortable: true },
+  { title: t('Institution Updatable'), key: 'institutionUpdatable', sortable: true },
+  { title: t('Actions'), key: 'actions', sortable: false },
+])
 </script>
-

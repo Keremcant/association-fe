@@ -148,7 +148,7 @@ function closeDialog() {
 
 function deleteMeal(id) {
   selectedId.value = id
-  confirmDialog.value.show(t('Delete'), t('Are you sure you want to delete this record?'))
+  confirmDialog.value.show(t('Delete'))
 }
 
 async function webPublish(uuid) {

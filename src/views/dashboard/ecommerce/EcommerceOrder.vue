@@ -20,18 +20,20 @@ const tabsData = [
       </template>
     </VCardItem>
 
-    <VTabs
+    <!--
+      <VTabs
       v-model="currentTab"
       grow
       class="disable-tab-transition"
-    >
-      <VTab
-        v-for="(tab, index) in tabsData"
-        :key="index"
       >
-        {{ tab }}
+      <VTab
+      v-for="(tab, index) in tabsData"
+      :key="index"
+      >
+      {{ tab }}
       </VTab>
-    </VTabs>
+      </VTabs>
+    -->
 
     <VCardText>
       <VWindow v-model="currentTab">

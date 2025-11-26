@@ -221,6 +221,7 @@
                       v-model="edu.graduationYear"
                       type="date"
                       :label="$t('Graduation Date')"
+                      :rules="[requiredValidator]"
                     />
                   </VCol>
                   <VCol
@@ -290,6 +291,7 @@
                       v-model="job.startDate"
                       type="date"
                       :label="$t('Start Date')"
+                      :rules="[requiredValidator]"
                       dense
                     />
                   </VCol>
@@ -302,6 +304,7 @@
                       v-model="job.endDate"
                       type="date"
                       :label="$t('End Date')"
+                      :rules="[requiredValidator]"
                       dense
                     />
                     <div
@@ -385,6 +388,7 @@
                       v-model="cert.date"
                       type="date"
                       :label="$t('Date')"
+                      :rules="[requiredValidator]"
                     />
                   </VCol>
                   <VCol
