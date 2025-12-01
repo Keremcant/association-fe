@@ -460,5 +460,22 @@
   "Updatable": "Updatable",
   "Institution update permission deactivated": "Institution update permission deactivated",
   "Institution Details": "Institution Details",
-  "Close": "Close"
+  "Close": "Close",
+  "Emergency Medical Technician": "Emergency Medical Technician",
+  "Child Development Specialist": "Child Development Specialist",
+  "Midwife": "Midwife",
+  "Assistant Midwife": "Assistant Midwife",
+  "Occupational Therapist": "Occupational Therapist",
+  "Physical Therapy Technician": "Physical Therapy Technician",
+  "Physiotherapist": "Physiotherapist",
+  "Gerontologist": "Gerontologist",
+  "Nurse": "Nurse",
+  "Assistant Nurse": "Assistant Nurse",
+  "Psychologist": "Psychologist",
+  "Psychological Counselor": "Psychological Counselor",
+  "Health Officer": "Health Officer",
+  "Health Technician": "Health Technician",
+  "Social Worker": "Social Worker",
+  "Physician": "Physician",
+  "Number Of Views": "Number Of Views"
 }

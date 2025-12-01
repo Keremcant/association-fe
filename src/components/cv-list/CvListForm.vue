@@ -87,7 +87,7 @@
                 md="6"
               >
                 <AppTextField
-                  v-model="form.educabilityStatus"
+                  v-model="form.educationStatus"
                   :label="$t('Education Status')"
                   disabled
                 />
@@ -297,6 +297,10 @@
       <p><strong>{{ $t('E Mail') }}:</strong> {{ form.email }}</p>
       <p><strong>{{ $t('Birth Date') }}:</strong> {{ form.birthDate }}</p>
       <p><strong>{{ $t('Gender') }}:</strong> {{ form.gender }}</p>
+      <p><strong>{{ $t('Education Status') }}:</strong> {{ form.educationStatus }}</p>
+      <p><strong>{{ $t('Disability') }}:</strong> {{ form.disabilityStatus }}</p>
+      <p><strong>{{ $t('Appellation') }}:</strong> {{ form.title }}</p>
+      <p><strong>{{ $t('City') }}:</strong> {{ form.city }}</p>
       <p><strong>{{ $t('Address') }}:</strong> {{ form.address }}</p>
 
       <hr>

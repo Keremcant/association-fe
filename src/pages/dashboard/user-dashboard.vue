@@ -71,7 +71,7 @@ const snackbar = ref({ show: (msg, type) => console.log(msg, type) }) // örnek 
 
 onBeforeMount(async () => {
   try {
-    const response = await axios.get('/dashboard/get-admin-dashboard')
+    const response = await axios.get('/dashboard/get-user-dashboard')
     if (response.status >= 200 && response.status < 300) {
       dashboardData.value = response.data
     } else {

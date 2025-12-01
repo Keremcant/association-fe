@@ -105,7 +105,24 @@ const positions = [
   t('Assistant Chef'),
   t('Security Staff'),
   t('Driver'),
+  t('Emergency Medical Technician'),
+  t('Child Development Specialist'),
+  t('Midwife'),
+  t('Assistant Midwife'),
+  t('Occupational Therapist'),
+  t('Physical Therapy Technician'),
+  t('Physiotherapist'),
+  t('Gerontologist'),
+  t('Nurse'),
+  t('Assistant Nurse'),
+  t('Psychologist'),
+  t('Psychological Counselor'),
+  t('Health Officer'),
+  t('Health Technician'),
+  t('Social Worker'),
+  t('Physician'),
 ]
+
 
 // Form verileri
 const form = ref({

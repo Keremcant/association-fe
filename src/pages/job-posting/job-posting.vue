@@ -41,6 +41,16 @@
             <VIcon icon="tabler-brand-webflow" />
           </IconBtn>
         </template>
+        <template #status="{ item }">
+          <VChip
+            :color="statusColor(item.item.webPushing)"
+            size="small"
+            label
+            class="text-capitalize"
+          >
+            {{ statusName(item.item.webPushing) }}
+          </VChip>
+        </template>
       </DataTable>
     </VCardItem>
 
@@ -116,6 +126,7 @@ const headers = computed(() => [
   { title: t('Region'), key: 'institution.institutionRegion', sortable: true },
   { title: t('City'), key: 'institution.institutionProvince', sortable: true },
   { title: t('Position'), key: 'position', sortable: true },
+  { title: t('Status'), key: 'status', sortable: false },
   { title: t('Actions'), key: 'actions', sortable: false },
 ])
 
@@ -155,7 +166,28 @@ async function webPublish(uuid) {
   const response = await axios.put(`/job-posting/${uuid}/web-pushing`)
   if (response.status >= 200 && response.status < 300) {
     snackbar.value.show(t('Web Pushing successfully'), 'success')
+    datatable.value.refresh()
 
+  }
+}
+
+function statusColor(status) {
+  if (status === false) {
+    return 'error'
+  }
+  else if (status === true) {
+    return 'success'
+  }
+  else {
+    return 'default-background'
+  }
+}
+
+const statusName = status => {
+  if (status === false) {
+    return 'Yayında Değil'
+  } else {
+    return 'Yayında'
   }
 }
 

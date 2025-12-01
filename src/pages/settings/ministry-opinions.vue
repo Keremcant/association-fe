@@ -136,6 +136,7 @@ const headers = computed(() => [
     sortable: true,
     value: item => formatDate(item.decisionDate),
   },
+  { title: t('Number Of Views'), key: 'numberOfViews', sortable: false },
   { title: t('Actions'), key: 'actions', sortable: false },
 ])
 </script>
